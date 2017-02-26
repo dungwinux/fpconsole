@@ -1,0 +1,10 @@
+*.lps
+*.ppu
+*.exe
+*.bat
+*.log
+*.bak*
+*.o
+*.dat
+.vscode/
+deploy/
