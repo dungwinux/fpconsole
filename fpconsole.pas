@@ -8,7 +8,7 @@ begin
 end;
 procedure Create;
 begin
-    FName:='_'+N2S(random(10000)+random(10000));
+    FName:='_'+N2S(random(10000))+N2S(random(10000));
     assign(m,fname+'.pas');
     rewrite(m);
 end;
@@ -71,7 +71,7 @@ begin
     DeleteFile(FName+'.pas');
 end;
 begin
-    writeln('FPConsole Version 1.0 Build 170226 - Created by Winux8YT3');
+    writeln('FPConsole Version 1.0 Build 170227 - Created by Winux8YT3');
     Create;
     ReadDat;
     Execute;
