@@ -71,7 +71,7 @@ begin
     DeleteFile(FName+'.pas');
 end;
 begin
-    writeln('FPConsole Version 1.0 Build 170227 - Created by Winux8YT3');
+    writeln('FPConsole Version 1.0.1 Build 170227 - Created by Winux8YT3');
     Create;
     ReadDat;
     Execute;
