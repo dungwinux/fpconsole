@@ -54,6 +54,9 @@ i,j,m,n:integer;
 
 ## Changelog
 
+### Version 1.0.1 *Build 170227*
+- Fix Directory.
+
 ### Version 1.0 *Build 170226*
 - First Release.
 
