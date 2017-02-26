@@ -44,17 +44,30 @@ begin
     close(m);
 end;
 procedure Execute;
+var s:string;
+    function Get:string;
+    Var FileDat:TSearchRec;
+    begin
+        if FindFirst(s+'*',faDirectory,FileDat)=0 then
+            repeat
+                With FileDat do Get:=Name;
+            until FindNext(FileDat)<>0;
+        FindClose(FileDat);
+    end;
 begin
-    ExecuteProcess('"C:\FPC\3.0.0\bin\i386-win32\fpc.exe"', ['-v0',FName], []);
-    clrscr;
-    assign(m,fname+'.exe');
-    {$I-}reset(m);{$I+}
-    if IOResult=0 then begin
-        ExecuteProcess(FName+'.exe','',[]);
-        close(m);
-        DeleteFile(FName+'.exe');
-        DeleteFile(FName+'.o');
-    end else write('ERROR');
+    s:='C:\FPC\';
+    if not DirectoryExists(s) then write('FPC not yet installed') else begin
+        ExecuteProcess(s+Get+'\bin\i386-win32\fpc.exe', ['-v0',FName], []);
+        clrscr;
+        assign(m,fname+'.exe');
+        {$I-}reset(m);{$I+}
+        if IOResult=0 then begin
+            ExecuteProcess(FName+'.exe','',[]);
+            close(m);
+            DeleteFile(FName+'.exe');
+            DeleteFile(FName+'.o');
+        end else write('ERROR');
+    end;
     DeleteFile(FName+'.pas');
 end;
 begin
