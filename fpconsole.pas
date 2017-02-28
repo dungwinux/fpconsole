@@ -1,14 +1,15 @@
 uses crt,sysutils;
 var 
-    fname:string;
+    dir,fname:string;
     m:text;     // Main File
-function N2S(k:word):string;
+function N2S(k:word):string;    // Convert
 begin
     str(k,N2S);
 end;
 procedure Create;
 begin
-    FName:='_'+N2S(random(10000))+N2S(random(10000));
+    randomize;
+    FName:='_'+N2S(random(10000)+random(10000));
     assign(m,fname+'.pas');
     rewrite(m);
 end;
@@ -33,46 +34,78 @@ begin
     writeln(m,'crt;');
     writeln(m,#13#10,'type',#13#10,'Int=Integer;');
     Input('type.dat');  // Read type
-    writeln(m,#13#10,'const',#13#10,'_ProgName=',#39,'FPConsole',#39,';');
+    writeln(m,#13#10,'const',#13#10,'_Default=',#39,'FPConsole',#39,';');
     Input('const.dat'); // Read const
-    writeln(m,#13#10,'var',#13#10,'nullStr:string;');
+    writeln(m,#13#10,'var',#13#10,'_nuStr:string;',#13#10,'_nInt:integer;',#13#10,'_nReal:real;');
     Input('var.dat');   // Read Var
     writeln(m,#13#10,'begin');
     if paramstr(1)='-f' then Input(paramstr(2)) else
     for i:=1 to ParamCount do writeln(m,paramstr(i));
+    if paramstr(1)='' then begin
+        writeln('[INPUT]');
+        readln;
+    end;
     write(m,'end.');
     close(m);
 end;
-procedure Execute;
-var s:string;
-    function Get:string;
-    Var FileDat:TSearchRec;
-    begin
-        if FindFirst(s+'*',faDirectory,FileDat)=0 then
+function Get:boolean;
+var FileDat:TSearchRec;
+begin
+    Get:=DirectoryExists('C:\FPC\');
+    if Get then begin
+        if FindFirst('C:\FPC\*',faDirectory,FileDat)=0 then
             repeat
-                With FileDat do Get:=Name;
+                dir:=FileDat.Name;
             until FindNext(FileDat)<>0;
         FindClose(FileDat);
+        if Dir='..' then Get:=False
+        else Dir:='C:\FPC\'+Dir+'\bin\i386-win32\fpc.exe';
     end;
+    Get:=Get and FileExists(dir);
+    writeln('Find FPC (Default):',Get);
+end;
+function Find(s:string):boolean;
+var FileDat:TSearchRec;
+    b:boolean;
 begin
-    s:='C:\FPC\';
-    if not DirectoryExists(s) then write('FPC not yet installed') else begin
-        ExecuteProcess(s+Get+'\bin\i386-win32\fpc.exe', ['-v0',FName], []);
-        clrscr;
-        assign(m,fname+'.exe');
-        {$I-}reset(m);{$I+}
-        if IOResult=0 then begin
-            ExecuteProcess(FName+'.exe','',[]);
-            close(m);
-            DeleteFile(FName+'.exe');
-            DeleteFile(FName+'.o');
-        end else write('ERROR');
+    s:=s+'\';
+    Find:=DirectoryExists(s);
+    if Find then begin
+        if FindFirst(s+'*',faAnyFile,FileDat)=0 then
+            repeat b:=(Find and (FileDat.Name='fpc.exe')) until (FindNext(FileDat)<>0) or b;
+        Find:=b;
+        FindClose(FileDat);
     end;
+end;
+function SysFind:boolean;
+var s:ansistring;
+begin
+    s:=GetEnvironmentVariable('PATH')+';';
+    repeat
+        dir:=copy(s,1,pos(';',s)-1);
+        SysFind:=Find(dir);
+        delete(s,1,pos(';',s)); 
+    until SysFind or (s='');
+    writeln('Find FPC (Custom):',SysFind);
+end;
+procedure Execute;
+begin
+    writeln('FPC Dir:',dir);
+    ReadDat;
+    ExecuteProcess(dir, ['-v0',FName], []);
+    writeln('[OUTPUT]');
     DeleteFile(FName+'.pas');
+    assign(m,fname+'.exe');
+    {$I-}reset(m);{$I+}
+    if IOResult=0 then begin
+        close(m);
+        DeleteFile(FName+'.o');
+        ExecuteProcess(FName+'.exe','',[]);
+        DeleteFile(FName+'.exe');
+    end else write('ERROR');
 end;
 begin
-    writeln('FPConsole Version 1.0.1 Build 170227 - Created by Winux8YT3');
+    writeln('FPConsole Version 1.1 Build 170228 - Created by Winux8YT3');
     Create;
-    ReadDat;
-    Execute;
+    if Get or SysFind then Execute;
 end.
