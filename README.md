@@ -1,8 +1,10 @@
 FPConsole
 ==============================
 
-## Debug tool for Pascal Developer.
-**FPConsole Requires _Free Pascal_ installed in your computer. [Download here](http://www.freepascal.org/download.var)**
+## Debug tool for Pascal Developer
+This debug tool helps running Pascal codes directly from console, instead of writing new script from beginning to debug.
+
+>**Warning**: FPConsole Requires _Free Pascal_ installed in the system. [Download here](http://www.freepascal.org/download.var)
 
 ### Instructions:
 
@@ -11,6 +13,8 @@ FPConsole
 
 - For Powershell 
 > `.\FPConsole [Command]`
+
+Example:
 ```
 PS C:\Code> .\fpconsole "write('Hello World');"
 ```
@@ -27,25 +31,25 @@ Example
 PS D:\Code> .\fpconsole -f "Code.dat"
 ```
 
-- _(Optional)_ Put Unit in to _**unit.dat**_
+- _(Optional)_ Add UNIT in to _**unit.dat**_
 ```
 sysutils,
 graph,
 ...
 ```
-- _(Optional)_ Put Type in to _**type.dat**_
+- _(Optional)_ Add TYPE in to _**type.dat**_
 ```
 Int=-128..128;
 a=array[1..100]of integer;
 ...
 ```
-- _(Optional)_ Put Const in to _**const.dat**_
+- _(Optional)_ Add CONST in to _**const.dat**_
 ```
 s='Hello';
 pi=3.14;
 ...
 ```
-- _(Optional)_ Put Var in to _**var.dat**_
+- _(Optional)_ Add VAR in to _**var.dat**_
 ```
 s:string;
 i,j,m,n:integer;
@@ -53,6 +57,9 @@ i,j,m,n:integer;
 ```
 
 ## Changelog
+
+### Version 1.1 *Build 170228*
+- Automatic Find FPC Directory.
 
 ### Version 1.0.1 *Build 170227*
 - Fix Directory.
