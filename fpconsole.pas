@@ -2,14 +2,11 @@ uses crt,sysutils;
 var 
     dir,fname:string;
     m:text;     // Main File
-function N2S(k:word):string;    // Convert
-begin
-    str(k,N2S);
-end;
 procedure Create;
 begin
     randomize;
-    FName:='_'+N2S(random(10000)+random(10000));
+    str(random(100000),FName);
+    FName:='_'+FName;
     assign(m,fname+'.pas');
     rewrite(m);
 end;
@@ -106,10 +103,9 @@ begin
         DeleteFile(FName+'.o');
         ExecuteProcess(FName+'.exe','',[]);
         DeleteFile(FName+'.exe');
-    end else write('ERROR');
+    end else write('COMPILE ERROR');
 end;
 begin
-    writeln('FPConsole Version 1.1 Build 170228 - Created by Winux8YT3');
-    Create;
-    if Get or SysFind then Execute else write('FPC Not Found');
+    clrscr;writeln('FPConsole Version 1.1 Build 170228 - Created by Winux8YT3');
+    Create;if Get or SysFind then Execute else write('FPC Not Found');
 end.
