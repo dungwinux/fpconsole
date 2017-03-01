@@ -15,6 +15,7 @@ begin
 end;
 procedure ReadDat;
 var i:byte;
+    t:string;
     procedure Input(s:string);
     var f:text;
     begin
@@ -42,8 +43,11 @@ begin
     if paramstr(1)='-f' then Input(paramstr(2)) else
     for i:=1 to ParamCount do writeln(m,paramstr(i));
     if paramstr(1)='' then begin
-        writeln('[INPUT]');
-        readln;
+        writeln('[INPUT] ( // to stop entering code )');
+        repeat
+            readln(t);
+            writeln(m,t);
+        until t='//';
     end;
     write(m,'end.');
     close(m);
