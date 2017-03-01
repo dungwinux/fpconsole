@@ -107,5 +107,5 @@ end;
 begin
     writeln('FPConsole Version 1.1 Build 170228 - Created by Winux8YT3');
     Create;
-    if Get or SysFind then Execute;
+    if Get or SysFind then Execute else write('FPC Not Found');
 end.
