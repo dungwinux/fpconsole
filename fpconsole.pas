@@ -1,52 +1,63 @@
 uses crt,sysutils;
 var 
-    dir,fname:string;
+    dir,fname:ansistring;
     m:text;     // Main File
-procedure Create;
+function Create:boolean;
+var s:ansistring;
 begin
     randomize;
     str(random(100000),FName);
     FName:='_'+FName;
-    assign(m,fname+'.pas');
-    rewrite(m);
+    s:=GetEnvironmentVariable('TEMP')+'\FPConsole';
+    Create:=(DirectoryExists(s)) or (CreateDir(s));
+    if Create then begin
+        FName:=s+'\'+Fname;
+        assign(m,fname+'.pas');
+        rewrite(m);
+    end;
+end;
+procedure Input(s:string);
+var f:text;
+begin
+    assign(f,s);
+    {$I-}reset(f);{$I+}
+    if IOResult=0 then begin
+        while not eof(f) do begin
+            readln(f,s);
+            writeln(m,s);
+        end;
+        close(f);
+    end;
 end;
 procedure ReadDat;
 var i:byte;
     t:string;
-    procedure Input(s:string);
-    var f:text;
-    begin
-        assign(f,s);
-        {$I-}reset(f);{$I+}
-        if IOResult=0 then begin
-            while not eof(f) do begin
-                readln(f,s);
-                writeln(m,s);
-            end;
-            close(f);
-        end;
-    end;
 begin
-    write(m,'uses ');
-    Input('unit.dat');  // Read unit
-    writeln(m,'crt;');
-    writeln(m,#13#10,'type',#13#10,'Int=Integer;');
-    Input('type.dat');  // Read type
-    writeln(m,#13#10,'const',#13#10,'_Default=',#39,'FPConsole',#39,';');
-    Input('const.dat'); // Read const
-    writeln(m,#13#10,'var',#13#10,'_nuStr:string;',#13#10,'_nInt:integer;',#13#10,'_nReal:real;');
-    Input('var.dat');   // Read Var
-    writeln(m,#13#10,'begin');
-    if paramstr(1)='-f' then Input(paramstr(2)) else
-    for i:=1 to ParamCount do writeln(m,paramstr(i));
-    if paramstr(1)='' then begin
-        writeln('[INPUT] ( // to stop entering code )');
-        repeat
-            readln(t);
-            writeln(m,t);
-        until t='//';
+    if Paramstr(1)='-f' then Input(paramstr(2))
+    else begin
+        write(m,'uses ');
+        Input('unit.dat');  // Read unit
+        writeln(m,'crt;');
+        writeln(m,#13#10,'type',#13#10,'Int=Integer;');
+        Input('type.dat');  // Read type
+        writeln(m,#13#10,'const',#13#10,'_Default=',#39,'FPConsole',#39,';');
+        Input('const.dat'); // Read const
+        writeln(m,#13#10,'var',#13#10,'_nuStr:string;',#13#10,'_nInt:integer;',#13#10,'_nReal:real;',#13#10,'_nText:text');
+        Input('var.dat');   // Read Var
+        writeln(m,#13#10,'begin');
+        case paramstr(1) of
+            '-fc'   :   Input(paramstr(2));
+            ''      :   begin
+                            writeln('[INPUT] ( // to stop entering code )');
+                            repeat
+                                readln(t);
+                                writeln(m,t);
+                            until t='//';
+                        end;
+            else for i:=1 to ParamCount do writeln(m,paramstr(i));
+        end;
+        write(m,'end.');
     end;
-    write(m,'end.');
     close(m);
 end;
 function Get:boolean;
@@ -106,6 +117,6 @@ begin
     end else write('COMPILE ERROR');
 end;
 begin
-    clrscr;writeln('FPConsole Version 1.1 Build 170228 - Created by Winux8YT3');
-    Create;if Get or SysFind then Execute else write('FPC Not Found');
+    clrscr;writeln('FPConsole Version 1.2.2 Build 170326 - Created by Winux8YT3');
+    if Create and (Get or SysFind) then Execute else write('FPC Not Found');
 end.
