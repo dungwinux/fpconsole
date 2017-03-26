@@ -2,33 +2,43 @@ FPConsole
 ==============================
 
 ## Debug tool for Pascal Developer
-This debug tool helps running Pascal codes directly from console, instead of writing new script from beginning to debug.
+This debug tool helps you directly write input and get output in Free Pascal Compiler without writing new file.
 
 >**Warning**: FPConsole Requires _Free Pascal_ installed in the system. [Download here](http://www.freepascal.org/download.var)
 
 ### Instructions:
 
-- For Command Prompt :
-> `FPConsole [Command]`
-
-- For Powershell 
-> `.\FPConsole [Command]`
-
-Example:
-```
-PS C:\Code> .\fpconsole "write('Hello World');"
-```
-
-- Put Bottom Code in to a file then 
-> `FPConsole -f [File Include Code]`
-
-or
-
-> `.\FPConsole -f [File Include Code]`
+- For Command Prompt
+> `fpconsole [Command]`
 
 Example
 ```
-PS D:\Code> .\fpconsole -f "Code.dat"
+C:\> fpconsole "write('Hello World!');"
+```
+![Ex-Cmd](/img/fpconsole.gif)
+
+- For Powershell 
+> `.\fpconsole [Command]`
+
+Example
+```
+PS C:\> .\fpconsole "write('Hello World!');"
+```
+![Ex-Powershell](/img/fpconsole_power.gif)
+
+- Get Code From a Text File
+
+> `.\FPConsole -f [File Include Code]`
+
+- Or Get The Whole Source Code (FPConsole 1.2+)
+
+> `.\FPConsole -fs [Source Code File]`
+
+Example
+```
+PS C:\> .\fpconsole -f "Code.dat"
+
+PS C:\> .\fpconsole -fs "Code.pas"
 ```
 
 - _(Optional)_ Add UNIT in to _**unit.dat**_
@@ -57,6 +67,11 @@ i,j,m,n:integer;
 ```
 
 ## Changelog
+
+### Version 1.2.2 *Build 170326*
+- Change Work Folder to %TEMP%.
+- Add Help (`-h`), Clear (`-c`), Read Source (`-fs`).
+
 
 ### Version 1.1 *Build 170228*
 - Automatic Find FPC Directory.

@@ -1,17 +1,16 @@
 uses crt,sysutils;
 var 
-    dir,fname:ansistring;
+    dir,fname,tmp:ansistring;
     m:text;     // Main File
 function Create:boolean;
-var s:ansistring;
 begin
     randomize;
     str(random(100000),FName);
     FName:='_'+FName;
-    s:=GetEnvironmentVariable('TEMP')+'\FPConsole';
-    Create:=(DirectoryExists(s)) or (CreateDir(s));
+    tmp:=GetEnvironmentVariable('TEMP')+'\FPConsole';
+    Create:=(DirectoryExists(tmp)) or (CreateDir(tmp));
     if Create then begin
-        FName:=s+'\'+Fname;
+        FName:=tmp+'\'+Fname;
         assign(m,fname+'.pas');
         rewrite(m);
     end;
@@ -33,7 +32,7 @@ procedure ReadDat;
 var i:byte;
     t:string;
 begin
-    if Paramstr(1)='-f' then Input(paramstr(2))
+    if Paramstr(1)='-fs' then Input(paramstr(2))
     else begin
         write(m,'uses ');
         Input('unit.dat');  // Read unit
@@ -42,11 +41,11 @@ begin
         Input('type.dat');  // Read type
         writeln(m,#13#10,'const',#13#10,'_Default=',#39,'FPConsole',#39,';');
         Input('const.dat'); // Read const
-        writeln(m,#13#10,'var',#13#10,'_nuStr:string;',#13#10,'_nInt:integer;',#13#10,'_nReal:real;',#13#10,'_nText:text');
+        writeln(m,#13#10,'var',#13#10,'_nuStr:string;',#13#10,'_nInt:integer;',#13#10,'_nReal:real;',#13#10,'_nText:text;');
         Input('var.dat');   // Read Var
         writeln(m,#13#10,'begin');
         case paramstr(1) of
-            '-fc'   :   Input(paramstr(2));
+            '-f'    :   Input(paramstr(2));
             ''      :   begin
                             writeln('[INPUT] ( // to stop entering code )');
                             repeat
@@ -116,19 +115,29 @@ begin
         DeleteFile(FName+'.exe');
     end else write('COMPILE ERROR');
 end;
+procedure Clear;
+begin
+    if DirectoryExists(Tmp) and RemoveDir(Tmp) then begin
+        CreateDir(Tmp);
+        write('DONE!');
+    end else write('DIR ERROR');
+end;
 procedure Help;
 begin
-    writeln('INFO: FPConsole is a tool help you directly write input and get output in Free Pascal Compiler');
+    writeln('INFO: FPConsole is a tool helps you directly write input and get output in Free Pascal Compiler');
     writeln('To be easy, you can directly write input right in param or copy it in file');
     writeln('Sometime, when there is error or forever-loop and the program exited not properly, you can look back the code in %TMP%\FPConsole Folder');
     writeln('All FPConsole Switch:');
     writeln('[blank]:   Read Function and Procedure by input');
-    writeln('-f     :   Read the Whole File in Formatted Type (.pas)');
-    writeln('-fc    :   Read Text File with only Funcion and Procedure');
+    writeln('-c     :   Clear temp');
+    writeln('-fs    :   Read the Whole File in Formatted Type (.pas)');
+    writeln('-f     :   Read Text File with only Funcion and Procedure');
     writeln('-h     :   Show This Help');
+    write('FPConsole is an Open-Source Program. Github:FPConsole');   // Dont change this line
 end;
 begin
     clrscr;writeln('FPConsole Version 1.2.2 Build 170326 - Created by Winux8YT3');
     if paramstr(1)='-h' then Help
-    else if Create and (Get or SysFind) then Execute else write('FPC Not Found');
+    else if paramstr(1)='-c' then Clear
+    else if Create and (Get or SysFind) then Execute else write('FPC NOT FOUND');
 end.
