@@ -116,7 +116,19 @@ begin
         DeleteFile(FName+'.exe');
     end else write('COMPILE ERROR');
 end;
+procedure Help;
+begin
+    writeln('INFO: FPConsole is a tool help you directly write input and get output in Free Pascal Compiler');
+    writeln('To be easy, you can directly write input right in param or copy it in file');
+    writeln('Sometime, when there is error or forever-loop and the program exited not properly, you can look back the code in %TMP%\FPConsole Folder');
+    writeln('All FPConsole Switch:');
+    writeln('[blank]:   Read Function and Procedure by input');
+    writeln('-f     :   Read the Whole File in Formatted Type (.pas)');
+    writeln('-fc    :   Read Text File with only Funcion and Procedure');
+    writeln('-h     :   Show This Help');
+end;
 begin
     clrscr;writeln('FPConsole Version 1.2.2 Build 170326 - Created by Winux8YT3');
-    if Create and (Get or SysFind) then Execute else write('FPC Not Found');
+    if paramstr(1)='-h' then Help
+    else if Create and (Get or SysFind) then Execute else write('FPC Not Found');
 end.
