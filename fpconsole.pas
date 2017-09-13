@@ -1,7 +1,7 @@
 PROGRAM fpconsole;
 USES Crt, SysUtils;
 VAR 
-    // dir's value is the path to Free Pascal Compiler (ex. C:\path\to\fpc\fpc.exe)
+    // dir's value is the path to Free Pascal Compiler (ex. C:\path\to\fpc\fpc.exe on Windows)
     // fname's value is the file name (without file extension) of 
     //     the Pascal source code file (& its object & executable files) that the program deals with
     // tmp's value is the path of the program's temporary folder, under a directory specified by TEMP (on Windows)
