@@ -1,5 +1,5 @@
 PROGRAM fpconsole;
-USES Crt, SysUtils;
+USES Crt, SysUtils {$IFDEF LINUX}, Process{$ENDIF};
 VAR 
     // dir's value is the path to Free Pascal Compiler (ex. C:\path\to\fpc\fpc.exe on Windows)
     // fname's value is the file name (without file extension) of 
@@ -18,10 +18,10 @@ Begin
     Randomize;
     Str(random(100000), fname);  // Use a random number as the name to our .pas file
     fname := '_' + fname;
-    tmp := GetEnvironmentVariable('TEMP') + '\FPConsole';
+    tmp := {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF} {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
     Create := (DirectoryExists(tmp)) or (CreateDir(tmp));  // Create a temporary folder for the program
     If Create then Begin
-                   fname := tmp + '\' + fname;
+                   fname := tmp + {$IFDEF MSWINDOWS}'\'{$ENDIF} {$IFDEF LINUX}'/'{$ENDIF} + fname;
                    Assign(m, fname + '.pas');
                    Rewrite(m);
                    End;
@@ -94,6 +94,7 @@ End;
 Function Get: boolean;
 VAR FileDat: TSearchRec;
 Begin
+    {$IFDEF MSWINDOWS}
     Get := DirectoryExists('C:\FPC\');
     If Get then Begin
                 If FindFirst('C:\FPC\*', faDirectory, FileDat) = 0 then
@@ -106,6 +107,12 @@ Begin
                     else dir := 'C:\FPC\' + dir + '\bin\i386-win32\fpc.exe';
     End;
     Get := Get and FileExists(dir);
+    {$ENDIF}
+
+    {$IFDEF LINUX}
+    Get := FileExists('/usr/bin/fpc');
+    If Get then dir := '/usr/bin/fpc';
+    {$ENDIF}
     Writeln('Find FPC (Default):', Get);
 End;
 
@@ -118,12 +125,12 @@ VAR
     FileDat: TSearchRec;
     b: boolean;
 Begin
-    s := s + '\';
+    s := s + {$IFDEF MSWINDOWS}'\'{$ENDIF} {$IFDEF LINUX}'/'{$ENDIF};
     Find := DirectoryExists(s);
     If Find then begin
         If FindFirst(s + '*', faAnyFile, FileDat) = 0 then
             Repeat 
-                b := (Find and (FileDat.Name = 'fpc.exe')) 
+                b := (Find and (FileDat.Name = {$IFDEF MSWINDOWS}'fpc.exe'{$ENDIF} {$IFDEF LINUX}'fpc'{$ENDIF})) 
             Until (FindNext(FileDat) <> 0) or b;
         Find := b;
         FindClose(FileDat);
@@ -137,11 +144,11 @@ End;
 Function SysFind:boolean;
 VAR s: AnsiString;
 Begin
-    s := GetEnvironmentVariable('PATH') + ';';
+    s := GetEnvironmentVariable('PATH') + {$IFDEF MSWINDOWS}';'{$ENDIF} {$IFDEF LINUX}':'{$ENDIF};
     Repeat
-        dir := copy(s, 1, pos(';', s) - 1);
+        dir := copy(s, 1, pos({$IFDEF MSWINDOWS}';'{$ENDIF} {$IFDEF LINUX}':'{$ENDIF}, s) - 1);
         SysFind := Find(dir);
-        delete(s, 1, pos(';', s)); 
+        delete(s, 1, pos({$IFDEF MSWINDOWS}';'{$ENDIF} {$IFDEF LINUX}':'{$ENDIF}, s)); 
     Until SysFind or (s = '');
     Writeln('Find FPC (Custom):', SysFind);
 End;
@@ -154,16 +161,17 @@ Procedure Execute;
 Begin
     Writeln('FPC Dir:', dir);
     ReadDat;
-    ExecuteProcess(dir, ['-v0', fname], []);
+    {$IFDEF MSWINDOWS}ExecuteProcess(dir, ['-v0', fname], []);{$ENDIF}
+    {$IFDEF LINUX}RunCommand('/bin/bash', ['-c', dir + ' ' + fname + ' &>/dev/null'], tmp);{$ENDIF}
     Writeln('[OUTPUT]');
-    DeleteFile(fname+ '.pas');
-    Assign(m, fname + '.exe');
+    DeleteFile(fname + '.pas');
+    Assign(m, fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
     {$I-} Reset(m); {$I+}
     If IOResult = 0 then begin
                        Close(m);
                        DeleteFile(fname + '.o');
-                       ExecuteProcess(fname + '.exe', '', []);
-                       DeleteFile(fname + '.exe');
+                       ExecuteProcess(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF}, '', []);
+                       DeleteFile(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
                        End 
     else Write('COMPILE ERROR');
 End;
