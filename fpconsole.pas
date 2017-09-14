@@ -79,7 +79,7 @@ Begin
                         Writeln(m, t);  // Append user's input to writing file
                     Until t = '//';
                     End;
-            else For i := 1 to ParamCount do writeln(m, paramstr(i));
+            else For i := 1 to ParamCount do Writeln(m, paramstr(i));
         End;
         Write(m, 'end.');
     End;
@@ -162,7 +162,7 @@ Begin
     Writeln('FPC Dir:', dir);
     ReadDat;
     {$IFDEF MSWINDOWS}ExecuteProcess(dir, ['-v0', fname], []);{$ENDIF}
-    {$IFDEF LINUX}RunCommand('/bin/bash', ['-c', dir + ' ' + fname + ' &>/dev/null'], tmp);{$ENDIF}
+    {$IFDEF LINUX}ExecuteProcess('/bin/bash', ['-c', 'fpc ' + fname + ' &>/dev/null']);{$ENDIF}
     Writeln('[OUTPUT]');
     DeleteFile(fname + '.pas');
     Assign(m, fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
@@ -173,20 +173,18 @@ Begin
                        ExecuteProcess(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF}, '', []);
                        DeleteFile(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
                        End 
-    else Write('COMPILE ERROR');
+    else Writeln('COMPILE ERROR');
 End;
 
 {
-    What the fuck?
+    Delete all files in the program's temporary folder
 }
 Procedure Clear;
+CONST tmp = {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF}
+            {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
 Begin
-    If DirectoryExists(tmp) and RemoveDir(tmp)
-        then Begin
-             CreateDir(tmp);
-             Write('DONE');
-             End 
-    else Write('DIR ERROR');
+    If DirectoryExists(tmp) and RemoveDir(tmp) then CreateDir(tmp)
+    else Writeln('DIR ERROR');
 End;
 
 {
@@ -212,5 +210,5 @@ BEGIN
     Writeln('FPConsole Version 1.2.2 Build 170326 - Created by Winux8YT3');
     If paramstr(1) = '-h' then Help
     else if paramstr(1) = '-c' then Clear
-    else if Create and (Get or SysFind) then Execute else Write('FPC NOT FOUND');
+    else if Create and (Get or SysFind) then Execute else Writeln('FPC NOT FOUND');
 END.
