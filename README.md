@@ -2,35 +2,44 @@ FPConsole
 ==============================
 
 ## Debug tool for Pascal Developer
-This debug tool helps you directly write input and get output in Free Pascal Compiler without writing new file.
+This debug tool helps you directly write input and get output in Free Pascal Compiler without writing a new file.
 
->**Warning**: FPConsole Requires _Free Pascal_ installed in the system. [Download here](http://www.freepascal.org/download.var)
+**Note**: FPConsole requires _Free Pascal_ installed on the system. [Download here](http://www.freepascal.org/download.var)
 
 ### Instructions:
 
-- For Command Prompt
-> `fpconsole [Command]`
+- For Windows Command Prompt
+> `fpconsole [command]`
 
 Example
 ```
 C:\> fpconsole "write('Hello World!');"
 ```
-![Ex-Cmd](/img/fpconsole.gif)
+![Ex-Cmd](/img/fpconsole_cmd.gif)
 
-- For Powershell 
-> `.\fpconsole [Command]`
+- For Windows Powershell 
+> `.\fpconsole [command]`
 
 Example
 ```
 PS C:\> .\fpconsole "write('Hello World!');"
 ```
-![Ex-Powershell](/img/fpconsole_power.gif)
+![Ex-Powershell](/img/fpconsole_powershell.gif)
+
+- For Linux terminal
+> `./fpconsole [command]`
+
+Example
+```
+$ ./fpconsole -fs HelloWorld.pas
+```
+![Ex-Terminal](/img/fpconsole_linux-terminal.gif)
 
 - Get Code From a Text File
 
 > `.\FPConsole -f [File Include Code]`
 
-- Or Get The Whole Source Code (FPConsole 1.2+)
+- ...or Get The Whole Source Code (FPConsole 1.2+)
 
 > `.\FPConsole -fs [Source Code File]`
 
@@ -41,25 +50,25 @@ PS C:\> .\fpconsole -f "Code.dat"
 PS C:\> .\fpconsole -fs "Code.pas"
 ```
 
-- _(Optional)_ Add UNIT in to _**unit.dat**_
+- _(Optional)_ Add UNIT to _**unit.dat**_
 ```
 sysutils,
 graph,
 ...
 ```
-- _(Optional)_ Add TYPE in to _**type.dat**_
+- _(Optional)_ Add TYPE to _**type.dat**_
 ```
 Int=-128..128;
 a=array[1..100]of integer;
 ...
 ```
-- _(Optional)_ Add CONST in to _**const.dat**_
+- _(Optional)_ Add CONST to _**const.dat**_
 ```
 s='Hello';
 pi=3.14;
 ...
 ```
-- _(Optional)_ Add VAR in to _**var.dat**_
+- _(Optional)_ Add VAR to _**var.dat**_
 ```
 s:string;
 i,j,m,n:integer;
