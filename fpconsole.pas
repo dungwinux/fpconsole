@@ -5,6 +5,7 @@ VAR
     // fname's value is the file name (without file extension) of 
     //     the Pascal source code file (& its object & executable files) that the program deals with
     // tmp's value is the path of the program's temporary folder, under a directory specified by TEMP (on Windows)
+    //     on Linux, temporary app data are stored in /tmp, so tmp's value should be /tmp/FPConsole
     dir, fname, tmp: AnsiString;
     m: text;     // Variable for main (temporary) Pascal source code file (.pas) to be executed
 
@@ -73,7 +74,7 @@ Begin
         Case paramstr(1) of
             '-f' :  Input(paramstr(2));
             ''   :  Begin  // Begin user's session for entering Pascal code
-                    Writeln('[INPUT] ( // to stop entering code )');
+                    Writeln('[INPUT] ( type "//" to stop entering code )');
                     Repeat
                         Readln(t);  // Get user's input (Pascal code)
                         Writeln(m, t);  // Append user's input to writing file
