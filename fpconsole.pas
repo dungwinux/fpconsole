@@ -184,8 +184,16 @@ Procedure Clear;
 CONST tmp = {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF}
             {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
 Begin
+    (* RemoveDir only removes directory when empty. Implemented a new way.
     If DirectoryExists(tmp) and RemoveDir(tmp) then CreateDir(tmp)
     else Writeln('DIR ERROR');
+    *)
+    If DirectoryExists(tmp) 
+        then Begin
+             {$IFDEF MSWINDOWS}ExecuteProcess('C:\Windows\System32\cmd.exe', ['/c', 'rmdir', tmp], []);{$ENDIF}
+             {$IFDEF LINUX}ExecuteProcess('/bin/bash', ['-c', 'rm -rf ' + tmp], []);{$ENDIF}
+             CreateDir(tmp);
+             End;
 End;
 
 {
