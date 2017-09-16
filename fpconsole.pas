@@ -163,6 +163,7 @@ Begin
     end;
 End;
 
+// Credit goes to David Heffernan on Stack Overflow
 // https://stackoverflow.com/questions/16336761/delete-directory-with-non-empty-subdirectory-and-files?answertab=votes#tab-top
 procedure DeleteDir(const DirName: Ansistring);
 var
