@@ -72,7 +72,6 @@ i,j,m,n:integer;
 - Change Work Folder to %TEMP%.
 - Add Help (`-h`), Clear (`-c`), Read Source (`-fs`).
 
-
 ### Version 1.1 *Build 170228*
 - Automatic Find FPC Directory.
 
