@@ -163,26 +163,26 @@ Begin
     end;
 End;
 
+// https://stackoverflow.com/questions/16336761/delete-directory-with-non-empty-subdirectory-and-files?answertab=votes#tab-top
 procedure DeleteDir(const DirName: Ansistring);
 var
   Path: string;
   F: TSearchRec;
-
 begin
-  Path:= DirName + '\*.*';
-  if FindFirst(Path, faAnyFile, F) = 0 then begin
-      repeat
-        if (F.Attr and faDirectory <> 0) then begin
-          if (F.Name <> '.') and (F.Name <> '..') then begin
-            DeleteDir(DirName + '\' + F.Name);
-          end;
-        end
-        else
-          DeleteFile(DirName + '\' + F.Name);
-      until FindNext(F) <> 0;
+    Path:= DirName + '\*.*';
+    if FindFirst(Path, faAnyFile, F) = 0 then begin
+        repeat
+            if (F.Attr and faDirectory <> 0) then begin
+                if (F.Name <> '.') and (F.Name <> '..') then begin
+                    DeleteDir(DirName + '\' + F.Name);
+                end;
+            end
+            else
+                DeleteFile(DirName + '\' + F.Name);
+        until FindNext(F) <> 0;
     end;
     FindClose(F);
-  RemoveDir(DirName);
+    RemoveDir(DirName);
 end;
 
 Procedure Clear;
