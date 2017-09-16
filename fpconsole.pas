@@ -7,6 +7,7 @@ begin
     randomize;
     str(random(100000),FName);
     FName:='_'+FName;
+    tmp:=GetEnvironmentVariable('TEMP')+'\FPConsole';
     Create:=(DirectoryExists(tmp)) or (CreateDir(tmp));
     if Create then begin
         FName:=tmp+'\'+Fname;
@@ -111,28 +112,15 @@ begin
         close(m);
         DeleteFile(FName+'.o');
         ExecuteProcess(FName+'.exe','',[]);
-        write('Process Executed. Press <Enter> to exit.');readln;
         DeleteFile(FName+'.exe');
     end else write('COMPILE ERROR');
 end;
 procedure Clear;
-    function Clean:boolean;
-    var 
-        f:ansistring;
-        FileDat:TSearchRec;
-    begin
-        Clean:=DirectoryExists(Tmp);
-        writeln(Clean);
-        if Clean and (FindFirst(tmp+'\*',faAnyFile,FileDat)=0) then
-            repeat
-                f:=FileDat.Name;
-                Clean:=Clean and DeleteFile(f);
-            until FindNext(FileDat)<>0;
-        FindClose(FileDat);
-    end;
 begin
-    if not Clean then write('UN');
-    writeln('SUCESSFULLY CLEARED');
+    if DirectoryExists(Tmp) and RemoveDir(Tmp) then begin
+        CreateDir(Tmp);
+        write('DONE!');
+    end else write('DIR ERROR');
 end;
 procedure Help;
 begin
@@ -149,7 +137,6 @@ begin
 end;
 begin
     clrscr;writeln('FPConsole Version 1.2.2 Build 170326 - Created by Winux8YT3');
-    tmp:=GetEnvironmentVariable('TMP')+'\FPConsole';
     if paramstr(1)='-h' then Help
     else if paramstr(1)='-c' then Clear
     else if Create and (Get or SysFind) then Execute else write('FPC NOT FOUND');
