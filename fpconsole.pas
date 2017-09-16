@@ -1,6 +1,5 @@
 uses crt,sysutils;
 var 
-    // BuildNum: string = {$I %DATE%}+'-'+{$I %TIME%};
     dir,fname,tmp:ansistring;
     m:text;     // Main File
 function Create:boolean;
