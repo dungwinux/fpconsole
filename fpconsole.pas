@@ -11,7 +11,6 @@ Begin
     Writeln('To make it easy, you can directly throw input as the argument or write it in a file');
     Writeln('Sometimes, when there is an error or an infinite loop and the program exited improperly, you can review the code in %TMP%\FPConsole folder');
     Writeln('All FPConsole Switch:');
-    Writeln('[blank]:   Read Function and Procedure by input');
     Writeln('-c     :   Clear TEMP');
     Writeln('-fs    :   Read the whole file in formatted type (.pas)');
     Writeln('-f     :   Read text file with only Function and Procedure');
