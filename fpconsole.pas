@@ -1,6 +1,6 @@
 uses crt,sysutils;
 var 
-    BuildNum: string = {$I %DATE%}+'-'+{$I %TIME%};
+    // BuildNum: string = {$I %DATE%}+'-'+{$I %TIME%};
     dir,fname,tmp:ansistring;
     m:text;     // Main File
 function Create:boolean;
@@ -149,7 +149,7 @@ begin
     write('FPConsole is an Open-Source Program. Github:FPConsole');   // Dont change this line
 end;
 begin
-    clrscr;writeln('FPConsole Version ',BuildNum,' - Created by Winux8YT3');
+    clrscr;writeln('FPConsole Version 1.2.2 Build 170326 - Created by Winux8YT3');
     tmp:=GetEnvironmentVariable('TMP')+'\FPConsole';
     if paramstr(1)='-h' then Help
     else if paramstr(1)='-c' then Clear
