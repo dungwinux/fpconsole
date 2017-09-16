@@ -34,8 +34,6 @@ Begin
     End;
 End;
 
-{
-}
 Procedure ReadDat;
 VAR 
     i: byte;
@@ -46,7 +44,7 @@ Begin
         Write(m, 'uses ');
         Input('unit.dat');  // Get unit
         Writeln(m, 'crt;');
-        Writeln(m, #13#10, 'type', #13#10, 'Int=Integer;');
+        Writeln(m, #13#10, 'type', #13#10, 'Int = Integer;');
         Input('type.dat');  // Get type
         Writeln(m, #13#10, 'const', #13#10, '_Default=', #39, 'FPConsole', #39, ';');
         Input('const.dat'); // Get const
@@ -55,13 +53,13 @@ Begin
         Writeln(m, #13#10, 'begin');
         Case ParamStr(1) of
             '-f' :  Input(ParamStr(2));
-            ''   :  Begin 
-                    Writeln('[INPUT] ( type "//" to stop entering code )');
-                    Repeat
-                        Readln(t);
-                        Writeln(m, t);
-                    Until t = '//';
-                    End;
+            // ''   :  Begin 
+            //         Writeln('[INPUT] ( type "//" to stop entering code )');
+            //         Repeat
+            //             Readln(t);
+            //             Writeln(m, t);
+            //         Until t = '//';
+            //         End;
             else For i := 1 to ParamCount do Writeln(m, ParamStr(i));
         End;
         Write(m, 'end.');
@@ -123,6 +121,7 @@ Begin
 End;
 
 Procedure Execute;
+var exitcode: integer;
 Begin
     Writeln('FPC Dir:', dir);
     ReadDat;
@@ -133,11 +132,14 @@ Begin
     Assign(m, fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
     {$I-} Reset(m); {$I+}
     If IOResult = 0 then begin
-                       Close(m);
-                       DeleteFile(fname + '.o');
-                       ExecuteProcess(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF}, '', []);
-                       DeleteFile(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
-                       End 
+        Close(m);
+        DeleteFile(fname + '.o');
+        exitcode = ExecuteProcess(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF}, '', []);
+        DeleteFile(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
+        writeln();
+        writeln('---------------------')
+        write('Process Exited with Exit code ', exitcode);
+    End 
     else Writeln('COMPILE ERROR');
 End;
 
