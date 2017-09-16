@@ -12,7 +12,7 @@ This debug tool helps you directly write input and get output in Free Pascal Com
 > `fpconsole [command]`
 
 Example
-```
+```batch
 C:\> fpconsole "write('Hello World!');"
 ```
 ![Ex-Cmd](/img/fpconsole_cmd.gif)
@@ -21,7 +21,7 @@ C:\> fpconsole "write('Hello World!');"
 > `.\fpconsole [command]`
 
 Example
-```
+```powershell
 PS C:\> .\fpconsole "write('Hello World!');"
 ```
 ![Ex-Powershell](/img/fpconsole_powershell.gif)
@@ -30,7 +30,7 @@ PS C:\> .\fpconsole "write('Hello World!');"
 > `./fpconsole [command]`
 
 Example
-```
+```bash
 $ ./fpconsole -fs HelloWorld.pas
 ```
 ![Ex-Terminal](/img/fpconsole_linux-terminal.gif)
@@ -44,34 +44,34 @@ $ ./fpconsole -fs HelloWorld.pas
 > `.\FPConsole -fs [Source Code File]`
 
 Example
-```
+```powershell
 PS C:\> .\fpconsole -f "Code.dat"
 
 PS C:\> .\fpconsole -fs "Code.pas"
 ```
 
 - _(Optional)_ Add UNIT to _**unit.dat**_
-```
+```pascal
 sysutils,
 graph,
 ...
 ```
 - _(Optional)_ Add TYPE to _**type.dat**_
-```
-Int=-128..128;
-a=array[1..100]of integer;
+```pascal
+Int = -128..128;
+a = array[1..100] of integer;
 ...
 ```
 - _(Optional)_ Add CONST to _**const.dat**_
-```
-s='Hello';
-pi=3.14;
+```pascal
+s = 'Hello';
+pi = 3.14;
 ...
 ```
 - _(Optional)_ Add VAR to _**var.dat**_
-```
-s:string;
-i,j,m,n:integer;
+```pascal
+s: string;
+i,j,m,n: integer;
 ...
 ```
 
