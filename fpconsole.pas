@@ -1,16 +1,32 @@
 uses crt, SysUtils;
 var
+    TEMPFOLDER: AnsiString;
     Build: string = {$I %DATE%}+'-'+{$I %TIME%};
-    dir, fname, tmp: AnsiString;
+    dir, fname: AnsiString;
     m: text;
 
+Procedure Help;
+Begin
+    Writeln('INFO: FPConsole is a tool that helps you directly write input and get output with the Free Pascal Compiler');
+    Writeln('To make it easy, you can directly throw input as the argument or write it in a file');
+    Writeln('Sometimes, when there is an error or an infinite loop and the program exited improperly, you can review the code in %TMP%\FPConsole folder');
+    Writeln('All FPConsole Switch:');
+    Writeln('[blank]:   Read Function and Procedure by input');
+    Writeln('-c     :   Clear TEMP');
+    Writeln('-fs    :   Read the whole file in formatted type (.pas)');
+    Writeln('-f     :   Read text file with only Function and Procedure');
+    Writeln('-h     :   Show this help');
+    Writeln('FPConsole is an Open-Source Program. Github: fpconsole');
+End;
+
 Function Create: boolean;
+var tmp: AnsiString;
 // Generate source file to compile
 Begin
     Randomize;
     Str(random(100000), fname);
     fname := '_' + fname;
-    tmp := {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF} {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
+    tmp := TEMPFOLDER;
     Create := (DirectoryExists(tmp)) or (CreateDir(tmp));
     If Create then Begin
         fname := tmp + {$IFDEF MSWINDOWS}'\'{$ENDIF} {$IFDEF LINUX}'/'{$ENDIF} + fname;
@@ -60,6 +76,7 @@ Begin
             //             Writeln(m, t);
             //         Until t = '//';
             //         End;
+            ''  :   Help;
             else For i := 1 to ParamCount do Writeln(m, ParamStr(i));
         End;
         Write(m, 'end.');
@@ -125,28 +142,31 @@ var exitcode: integer;
 Begin
     Writeln('FPC Dir:', dir);
     ReadDat;
-    {$IFDEF MSWINDOWS}ExecuteProcess(dir, ['-v0', fname], []);{$ENDIF}
-    {$IFDEF LINUX}ExecuteProcess('/bin/bash', ['-c', 'fpc ' + fname + ' &>/dev/null']);{$ENDIF}
-    Writeln('[OUTPUT]');
-    DeleteFile(fname + '.pas');
-    Assign(m, fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
-    {$I-} Reset(m); {$I+}
-    If IOResult = 0 then begin
-        Close(m);
-        DeleteFile(fname + '.o');
-        exitcode = ExecuteProcess(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF}, '', []);
-        DeleteFile(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
-        writeln();
-        writeln('---------------------')
-        write('Process Exited with Exit code ', exitcode);
-    End 
-    else Writeln('COMPILE ERROR');
+    if (ParamStr(1)<>'') then begin
+        {$IFDEF MSWINDOWS}ExecuteProcess(dir, ['-v0', fname], []);{$ENDIF}
+        {$IFDEF LINUX}ExecuteProcess('/bin/bash', ['-c', 'fpc ' + fname + ' &>/dev/null']);{$ENDIF}
+        DeleteFile(fname + '.pas');
+
+        Writeln('[OUTPUT]');
+        Assign(m, fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
+        {$I-} Reset(m); {$I+}
+        If IOResult = 0 then begin
+            Close(m);
+            DeleteFile(fname + '.o');
+            exitcode := ExecuteProcess(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF}, '', []);
+            DeleteFile(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
+            writeln;
+            writeln('---------------------');
+            write('Process Exited with Exit code ', exitcode);
+        End
+        else Writeln('COMPILE ERROR');
+    end;
 End;
 
 Procedure Clear;
-CONST tmp = {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF}
-            {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
+var tmp: AnsiString;
 Begin
+    tmp := TEMPFOLDER;
     If DirectoryExists(tmp) 
         then Begin
              {$IFDEF MSWINDOWS}ExecuteProcess('C:\Windows\System32\cmd.exe', ['/c', 'rmdir', tmp], []);{$ENDIF}
@@ -155,22 +175,9 @@ Begin
              End;
 End;
 
-Procedure Help;
-Begin
-    Writeln('INFO: FPConsole is a tool that helps you directly write input and get output with the Free Pascal Compiler');
-    Writeln('To make it easy, you can directly throw input as the argument or write it in a file');
-    Writeln('Sometimes, when there is an error or an infinite loop and the program exited improperly, you can review the code in %TMP%\FPConsole folder');
-    Writeln('All FPConsole Switch:');
-    Writeln('[blank]:   Read Function and Procedure by input');
-    Writeln('-c     :   Clear TEMP');
-    Writeln('-fs    :   Read the whole file in formatted type (.pas)');
-    Writeln('-f     :   Read text file with only Function and Procedure');
-    Writeln('-h     :   Show this help');
-    Writeln('FPConsole is an Open-Source Program. Github: fpconsole');
-End;
-
 begin
-    ClrScr;
+    // Clrscr;
+    TEMPFOLDER := {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF} {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
     Writeln('FPConsole ',Build,' - Created by Winux8YT3');
     If ParamStr(1) = '-h' then Help
     else if ParamStr(1) = '-c' then Clear
