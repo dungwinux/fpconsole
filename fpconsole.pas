@@ -1,66 +1,47 @@
 uses crt, SysUtils;
 var
-    // dir's value is the path to Free Pascal Compiler (ex. C:\path\to\fpc\fpc.exe on Windows)
-    // fname's value is the file name (without file extension) of 
-    //     the Pascal source code file (& its object & executable files) that the program deals with
-    // tmp's value is the path of the program's temporary folder, under a directory specified by TEMP (on Windows)
-    //     on Linux, temporary app data are stored in /tmp, so tmp's value should be /tmp/FPConsole
-    
     Build: string = {$I %DATE%}+'-'+{$I %TIME%};
     dir, fname, tmp: AnsiString;
-    m: text;     // Variable for main (temporary) Pascal source code file (.pas) to be executed
+    m: text;
 
-{
-    Create a new Pascal source code file & open it for writing
-    The source code file's name is a random number from 0 to 99999
-    and the file itself is located in the program's temporary folder
-}
 Function Create: boolean;
+// Generate source file to compile
 Begin
     Randomize;
-    Str(random(100000), fname);  // Use a random number as the name to our .pas file
+    Str(random(100000), fname);
     fname := '_' + fname;
     tmp := {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF} {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
-    Create := (DirectoryExists(tmp)) or (CreateDir(tmp));  // Create a temporary folder for the program
+    Create := (DirectoryExists(tmp)) or (CreateDir(tmp));
     If Create then Begin
-                   fname := tmp + {$IFDEF MSWINDOWS}'\'{$ENDIF} {$IFDEF LINUX}'/'{$ENDIF} + fname;
-                   Assign(m, fname + '.pas');
-                   Rewrite(m);
-                   End;
+        fname := tmp + {$IFDEF MSWINDOWS}'\'{$ENDIF} {$IFDEF LINUX}'/'{$ENDIF} + fname;
+        Assign(m, fname + '.pas');
+        Rewrite(m);
+    End;
 End;
 
-{
-    Read a file which its name is passed as the argument and copy the content to the main text file
-    parameter s (string) is the file name to be read
-}
+    // Pass the code to the temp source file
 Procedure Input(s: string);
 VAR f: text;
 Begin
     Assign(f, s);
     {$I-} Reset(f); {$I+}
     If IOResult = 0 then Begin
-            While not EOF(f) do Begin
-                            Readln(f, s);  // Read a line from file s
-                            Writeln(m, s);  // Copy that line to text file m
-                                End;
-            Close(f);
-                         End;
-    // File assigned to variable m remains unclosed for later manipulation
+        While not EOF(f) do Begin
+            Readln(f, s);  
+            Writeln(m, s);  
+        End;
+        Close(f);
+    End;
 End;
 
 {
-    Procedure reading data from .dat files and write a complete Pascal source code to source code file m
-    Note: unit.dat, type.dat, const.dat are user's manually created files
-    If the user does not create any .dat file, no new line will be written by the Input function in this function (ReadDat)
-    #13#10 = LineEnding (sLineBreak)
-    #39 = ' (single quotation mark)
 }
 Procedure ReadDat;
 VAR 
     i: byte;
     t: string;
 Begin
-    If ParamStr(1) = '-fs' then Input(ParamStr(2))  // The case in which the user has written his/her Pascal code in a .dat file
+    If ParamStr(1) = '-fs' then Input(ParamStr(2))
     else Begin
         Write(m, 'uses ');
         Input('unit.dat');  // Get unit
@@ -74,25 +55,20 @@ Begin
         Writeln(m, #13#10, 'begin');
         Case ParamStr(1) of
             '-f' :  Input(ParamStr(2));
-            ''   :  Begin  // Begin user's session for entering Pascal code
+            ''   :  Begin 
                     Writeln('[INPUT] ( type "//" to stop entering code )');
                     Repeat
-                        Readln(t);  // Get user's input (Pascal code)
-                        Writeln(m, t);  // Append user's input to writing file
+                        Readln(t);
+                        Writeln(m, t);
                     Until t = '//';
                     End;
             else For i := 1 to ParamCount do Writeln(m, ParamStr(i));
         End;
         Write(m, 'end.');
     End;
-    Close(m);  // Finish writing to source code file, ready to be compiled & executed
+    Close(m); 
 End;
 
-{
-    Attempt to find FPC, assuming the user put FPC in its default home directory
-    On Windows, it should be C:\FPC\[FPC version name]\bin\i386-win32\fpc.exe
-    Return true if FPC is found in the FPC default home directory, false otherwise
-}
 Function Get: boolean;
 VAR FileDat: TSearchRec;
 Begin
@@ -100,7 +76,6 @@ Begin
     Get := DirectoryExists('C:\FPC\');
     If Get then Begin
                 If FindFirst('C:\FPC\*', faDirectory, FileDat) = 0 then
-                    // Start looking for a folder that possibly holding FPC
                     Repeat
                         dir := FileDat.Name;
                     Until FindNext(FileDat) <> 0;
@@ -118,10 +93,6 @@ Begin
     Writeln('Find FPC (Default):', Get);
 End;
 
-{
-    Function for finding FPC executable in a given directory s
-    Return true if FPC is found, false otherwise
-}
 Function Find(s: string): boolean;
 VAR 
     FileDat: TSearchRec;
@@ -139,10 +110,6 @@ Begin
     End;
 End;
 
-{
-    Look for FPC in directories specified by the PATH variable
-    Return true if FPC is found in any of the directories, false otherwise
-}
 Function SysFind:boolean;
 VAR s: AnsiString;
 Begin
@@ -155,10 +122,6 @@ Begin
     Writeln('Find FPC (Custom):', SysFind);
 End;
 
-{
-    Compile the source code created and execute the output binary
-    Should remove the source code file (.pas), the object file (.o) and the executable (.exe) after execution
-}
 Procedure Execute;
 Begin
     Writeln('FPC Dir:', dir);
@@ -178,17 +141,10 @@ Begin
     else Writeln('COMPILE ERROR');
 End;
 
-{
-    Delete all files in the program's temporary folder
-}
 Procedure Clear;
 CONST tmp = {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF}
             {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
 Begin
-    (* RemoveDir only removes directory when empty. Implemented a new way.
-    If DirectoryExists(tmp) and RemoveDir(tmp) then CreateDir(tmp)
-    else Writeln('DIR ERROR');
-    *)
     If DirectoryExists(tmp) 
         then Begin
              {$IFDEF MSWINDOWS}ExecuteProcess('C:\Windows\System32\cmd.exe', ['/c', 'rmdir', tmp], []);{$ENDIF}
@@ -197,9 +153,6 @@ Begin
              End;
 End;
 
-{
-    Log program's info and manual lines to the console
-}
 Procedure Help;
 Begin
     Writeln('INFO: FPConsole is a tool that helps you directly write input and get output with the Free Pascal Compiler');
@@ -211,14 +164,13 @@ Begin
     Writeln('-fs    :   Read the whole file in formatted type (.pas)');
     Writeln('-f     :   Read text file with only Function and Procedure');
     Writeln('-h     :   Show this help');
-    Writeln('FPConsole is an Open-Source Program. Github: fpconsole');   // Use writeln as usual
+    Writeln('FPConsole is an Open-Source Program. Github: fpconsole');
 End;
 
-// Main
-BEGIN
+begin
     ClrScr;
-    Writeln('FPConsole Version 1.2.2 Build 170326 - Created by Winux8YT3');
+    Writeln('FPConsole ',Build,' - Created by Winux8YT3');
     If ParamStr(1) = '-h' then Help
     else if ParamStr(1) = '-c' then Clear
     else if Create and (Get or SysFind) then Execute else Writeln('FPC NOT FOUND');
-END.
+end.
