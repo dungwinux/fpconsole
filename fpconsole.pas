@@ -1,11 +1,12 @@
-PROGRAM fpconsole;
-USES Crt, SysUtils;
-VAR 
+uses crt, SysUtils;
+var
     // dir's value is the path to Free Pascal Compiler (ex. C:\path\to\fpc\fpc.exe on Windows)
     // fname's value is the file name (without file extension) of 
     //     the Pascal source code file (& its object & executable files) that the program deals with
     // tmp's value is the path of the program's temporary folder, under a directory specified by TEMP (on Windows)
     //     on Linux, temporary app data are stored in /tmp, so tmp's value should be /tmp/FPConsole
+    
+    Build: string = {$I %DATE%}+'-'+{$I %TIME%};
     dir, fname, tmp: AnsiString;
     m: text;     // Variable for main (temporary) Pascal source code file (.pas) to be executed
 
