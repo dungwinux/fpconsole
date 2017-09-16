@@ -176,7 +176,7 @@ Begin
 End;
 
 begin
-    // Clrscr;
+    Clrscr;
     TEMPFOLDER := {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF} {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
     Writeln('FPConsole ',Build,' - Created by Winux8YT3');
     If ParamStr(1) = '-h' then Help
