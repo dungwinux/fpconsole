@@ -1,5 +1,5 @@
 PROGRAM fpconsole;
-USES Crt, SysUtils {$IFDEF LINUX}, Process{$ENDIF};
+USES Crt, SysUtils;
 VAR 
     // dir's value is the path to Free Pascal Compiler (ex. C:\path\to\fpc\fpc.exe on Windows)
     // fname's value is the file name (without file extension) of 
@@ -59,7 +59,7 @@ VAR
     i: byte;
     t: string;
 Begin
-    If Paramstr(1) = '-fs' then Input(paramstr(2))  // The case in which the user has written his/her Pascal code in a .dat file
+    If ParamStr(1) = '-fs' then Input(ParamStr(2))  // The case in which the user has written his/her Pascal code in a .dat file
     else Begin
         Write(m, 'uses ');
         Input('unit.dat');  // Get unit
@@ -71,8 +71,8 @@ Begin
         Writeln(m, #13#10, 'var', #13#10, '_nuStr:string;', #13#10, '_nInt:integer;', #13#10, '_nReal:real;', #13#10, '_nText:text;');
         Input('var.dat');   // Get var
         Writeln(m, #13#10, 'begin');
-        Case paramstr(1) of
-            '-f' :  Input(paramstr(2));
+        Case ParamStr(1) of
+            '-f' :  Input(ParamStr(2));
             ''   :  Begin  // Begin user's session for entering Pascal code
                     Writeln('[INPUT] ( type "//" to stop entering code )');
                     Repeat
@@ -80,7 +80,7 @@ Begin
                         Writeln(m, t);  // Append user's input to writing file
                     Until t = '//';
                     End;
-            else For i := 1 to ParamCount do Writeln(m, paramstr(i));
+            else For i := 1 to ParamCount do Writeln(m, ParamStr(i));
         End;
         Write(m, 'end.');
     End;
@@ -217,7 +217,7 @@ End;
 BEGIN
     ClrScr;
     Writeln('FPConsole Version 1.2.2 Build 170326 - Created by Winux8YT3');
-    If paramstr(1) = '-h' then Help
-    else if paramstr(1) = '-c' then Clear
+    If ParamStr(1) = '-h' then Help
+    else if ParamStr(1) = '-c' then Clear
     else if Create and (Get or SysFind) then Execute else Writeln('FPC NOT FOUND');
 END.
