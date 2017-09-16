@@ -157,28 +157,50 @@ Begin
             DeleteFile(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
             writeln;
             writeln('---------------------');
-            write('Process Exited with Exit code ', exitcode);
+            writeln('Process Exited with Exit code ', exitcode);
         End
         else Writeln('COMPILE ERROR');
     end;
 End;
 
+procedure DeleteDir(const DirName: Ansistring);
+var
+  Path: string;
+  F: TSearchRec;
+
+begin
+  Path:= DirName + '\*.*';
+  if FindFirst(Path, faAnyFile, F) = 0 then begin
+      repeat
+        if (F.Attr and faDirectory <> 0) then begin
+          if (F.Name <> '.') and (F.Name <> '..') then begin
+            DeleteDir(DirName + '\' + F.Name);
+          end;
+        end
+        else
+          DeleteFile(DirName + '\' + F.Name);
+      until FindNext(F) <> 0;
+    end;
+    FindClose(F);
+  RemoveDir(DirName);
+end;
+
 Procedure Clear;
 var tmp: AnsiString;
 Begin
     tmp := TEMPFOLDER;
-    If DirectoryExists(tmp) 
-        then Begin
-             {$IFDEF MSWINDOWS}ExecuteProcess('C:\Windows\System32\cmd.exe', ['/c', 'rmdir', tmp], []);{$ENDIF}
-             {$IFDEF LINUX}ExecuteProcess('/bin/bash', ['-c', 'rm -rf ' + tmp], []);{$ENDIF}
-             CreateDir(tmp);
-             End;
+    If DirectoryExists(tmp) then Begin
+        {$IFDEF MSWINDOWS}DeleteDir(tmp);{$ENDIF}
+        {$IFDEF LINUX}ExecuteProcess('/bin/bash', ['-c', 'rm -rf ' + tmp], []);{$ENDIF}
+        CreateDir(tmp);
+    End;
 End;
 
 begin
     Clrscr;
     TEMPFOLDER := {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF} {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
     Writeln('FPConsole ',Build,' - Created by Winux8YT3');
+    writeln('TEMP Folder: ', TEMPFOLDER);
     If ParamStr(1) = '-h' then Help
     else if ParamStr(1) = '-c' then Clear
     else if Create and (Get or SysFind) then Execute else Writeln('FPC NOT FOUND');
