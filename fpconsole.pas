@@ -1,6 +1,5 @@
 uses crt, SysUtils;
 var
-
     Build: string = {$I %DATE%}+'-'+{$I %TIME%};
     dir, fname, tmp: AnsiString;
     m: text;
@@ -9,10 +8,10 @@ Function Create: boolean;
 // Generate source file to compile
 Begin
     Randomize;
-    Str(random(100000), fname);  // Use a random number as the name to our .pas file
+    Str(random(100000), fname);
     fname := '_' + fname;
     tmp := {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF} {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
-    Create := (DirectoryExists(tmp)) or (CreateDir(tmp));  // Create a temporary folder for the program
+    Create := (DirectoryExists(tmp)) or (CreateDir(tmp));
     If Create then Begin
         fname := tmp + {$IFDEF MSWINDOWS}'\'{$ENDIF} {$IFDEF LINUX}'/'{$ENDIF} + fname;
         Assign(m, fname + '.pas');
@@ -20,9 +19,7 @@ Begin
     End;
 End;
 
-{
-    Pass the code to the temp source file
-}
+    // Pass the code to the temp source file
 Procedure Input(s: string);
 VAR f: text;
 Begin
@@ -44,7 +41,7 @@ VAR
     i: byte;
     t: string;
 Begin
-    If ParamStr(1) = '-fs' then Input(ParamStr(2))  // The case in which the user has written his/her Pascal code in a .dat file
+    If ParamStr(1) = '-fs' then Input(ParamStr(2))
     else Begin
         Write(m, 'uses ');
         Input('unit.dat');  // Get unit
@@ -58,18 +55,18 @@ Begin
         Writeln(m, #13#10, 'begin');
         Case ParamStr(1) of
             '-f' :  Input(ParamStr(2));
-            ''   :  Begin  // Begin user's session for entering Pascal code
+            ''   :  Begin 
                     Writeln('[INPUT] ( type "//" to stop entering code )');
                     Repeat
-                        Readln(t);  // Get user's input (Pascal code)
-                        Writeln(m, t);  // Append user's input to writing file
+                        Readln(t);
+                        Writeln(m, t);
                     Until t = '//';
                     End;
             else For i := 1 to ParamCount do Writeln(m, ParamStr(i));
         End;
         Write(m, 'end.');
     End;
-    Close(m);  // Finish writing to source code file, ready to be compiled & executed
+    Close(m); 
 End;
 
 Function Get: boolean;
@@ -79,7 +76,6 @@ Begin
     Get := DirectoryExists('C:\FPC\');
     If Get then Begin
                 If FindFirst('C:\FPC\*', faDirectory, FileDat) = 0 then
-                    // Start looking for a folder that possibly holding FPC
                     Repeat
                         dir := FileDat.Name;
                     Until FindNext(FileDat) <> 0;
@@ -114,8 +110,6 @@ Begin
     End;
 End;
 
-{
-}
 Function SysFind:boolean;
 VAR s: AnsiString;
 Begin
@@ -170,7 +164,7 @@ Begin
     Writeln('-fs    :   Read the whole file in formatted type (.pas)');
     Writeln('-f     :   Read text file with only Function and Procedure');
     Writeln('-h     :   Show this help');
-    Writeln('FPConsole is an Open-Source Program. Github: fpconsole');   // Use writeln as usual
+    Writeln('FPConsole is an Open-Source Program. Github: fpconsole');
 End;
 
 begin
