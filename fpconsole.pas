@@ -194,6 +194,7 @@ Begin
         {$IFDEF LINUX}ExecuteProcess('/bin/bash', ['-c', 'rm -rf ' + tmp], []);{$ENDIF}
         CreateDir(tmp);
     End;
+    writeln('TEMP Folder Removed!');
 End;
 
 begin
