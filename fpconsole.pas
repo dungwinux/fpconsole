@@ -1,7 +1,9 @@
 uses crt,sysutils;
 var 
+    Build: string = {$I %DATE%}+'-'+{$I %TIME%};
     dir,fname,tmp:ansistring;
     m:text;     // Main File
+    
 function Create:boolean;
 begin
     randomize;
@@ -136,7 +138,7 @@ begin
     write('FPConsole is an Open-Source Program. Github:FPConsole');   // Dont change this line
 end;
 begin
-    clrscr;writeln('FPConsole Version 1.2.2 Build 170326 - Created by Winux8YT3');
+    clrscr;writeln('FPConsole ',Build,' - Created by Winux8YT3');
     if paramstr(1)='-h' then Help
     else if paramstr(1)='-c' then Clear
     else if Create and (Get or SysFind) then Execute else write('FPC NOT FOUND');
