@@ -1,9 +1,17 @@
 uses crt, SysUtils;
 var
-    TEMPFOLDER: AnsiString;
-    Build: string = {$I %DATE%}+'-'+{$I %TIME%};
-    dir, fname: AnsiString;
+    TEMPFOLDER, Build, dir, fname: AnsiString;
     m: text;
+
+procedure InitBuild();
+var s: string;
+begin
+    s:={$I %DATE%}+'-'+{$I %TIME%};
+	while pos('/',s) <> 0 do delete(s,pos('/',s),1);
+	while pos(':',s) <> 0 do delete(s,pos(':',s),1);
+    delete(s,1,2);delete(s,length(s)-1,2);
+    Build:=s;
+end;
 
 Procedure Help;
 Begin
@@ -198,7 +206,7 @@ Begin
 End;
 
 begin
-    Clrscr;
+    Clrscr;InitBuild;
     TEMPFOLDER := {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF} {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
     Writeln('FPConsole ',Build,' - Created by Winux8YT3');
     writeln('TEMP Folder: ', TEMPFOLDER);
