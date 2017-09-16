@@ -5,7 +5,7 @@ var
     //     the Pascal source code file (& its object & executable files) that the program deals with
     // tmp's value is the path of the program's temporary folder, under a directory specified by TEMP (on Windows)
     //     on Linux, temporary app data are stored in /tmp, so tmp's value should be /tmp/FPConsole
-
+    
     Build: string = {$I %DATE%}+'-'+{$I %TIME%};
     dir, fname, tmp: AnsiString;
     m: text;     // Variable for main (temporary) Pascal source code file (.pas) to be executed
@@ -217,7 +217,7 @@ End;
 // Main
 BEGIN
     ClrScr;
-    Writeln('FPConsole Version ',Build,'- Created by Winux8YT3');
+    Writeln('FPConsole Version 1.2.2 Build 170326 - Created by Winux8YT3');
     If ParamStr(1) = '-h' then Help
     else if ParamStr(1) = '-c' then Clear
     else if Create and (Get or SysFind) then Execute else Writeln('FPC NOT FOUND');
