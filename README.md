@@ -77,6 +77,10 @@ i,j,m,n: integer;
 
 ## Changelog
 
+### Version 1.3
+- Add support for Linux
+- Fix #5
+
 ### Version 1.2.2 *Build 170326*
 - Change Work Folder to %TEMP%.
 - Add Help (`-h`), Clear (`-c`), Read Source (`-fs`).
