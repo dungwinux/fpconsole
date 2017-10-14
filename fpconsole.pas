@@ -43,8 +43,8 @@ Begin
     End;
 End;
 
-    // Pass the code to the temp source file
 Procedure Input(s: string);
+// Pass the code to the temporary source file (is holded by the variable m)
 Var f: text;
 Begin
     Assign(f, s);
@@ -87,6 +87,7 @@ Begin
 End;
 
 Function Get: Boolean;
+// Find FPC by its default folder in installation
 Var FileDat: TSearchRec;
 Begin
     {$IFDEF MSWINDOWS}
@@ -111,6 +112,7 @@ Begin
 End;
 
 Function Find(s: string): boolean;
+// Find FPC in the given directory s (passed as argument)
 Var
     FileDat: TSearchRec;
     b: boolean;
@@ -128,6 +130,7 @@ Begin
 End;
 
 Function SysFind:boolean;
+// Find FPC by looking in the directories specified by the PATH environment variable
 Var s: AnsiString;
 Begin
     s := GetEnvironmentVariable('PATH') + {$IFDEF MSWINDOWS}';'{$ENDIF} {$IFDEF LINUX}':'{$ENDIF};
@@ -140,6 +143,7 @@ Begin
 End;
 
 Procedure Execute;
+// Compile & Execute the source code (source file is holded by the m variable)
 Var exitcode: integer;
 Begin
     Writeln('FPC Dir:', dir);
@@ -189,6 +193,7 @@ Begin
 End;
 
 Procedure Clear;
+// Remove program's temporary folder
 Var tmp: AnsiString;
 Begin
     tmp := TEMPFOLDER;
@@ -197,7 +202,7 @@ Begin
         {$IFDEF LINUX}ExecuteProcess('/bin/bash', ['-c', 'rm -rf ' + tmp], []);{$ENDIF}
         CreateDir(tmp);
     End;
-    writeln('TEMP Folder Removed!');
+    Writeln('TEMP folder removed.');
 End;
 
 BEGIN
