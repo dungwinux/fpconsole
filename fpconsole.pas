@@ -58,11 +58,52 @@ Begin
     End;
 End;
 
+Function FineArgs:Boolean;
+// Check if the passed arguments are okay
+Const
+    AvailableArgs: Array[1..4] of String = ('-c', , '-f', '-fs', '-h');
+Var
+    UsedArgs: Array of String;
+    k, j: Byte;
+Begin
+    SetLength(UsedArgs, ParamCount);
+    FineArgs := True;
+    For k := 1 to ParamCount do
+        Begin
+            For ArgItem in AvailableArgs do If ParamStr(k) = ArgItem then  // ParamStr(k) is a valid argument
+            Begin
+                For Arg in UsedArgs do If ParamStr(k) = Arg then
+                    Begin
+                        FineArgs := False;
+                        Writeln('Duplicate argument:', ParamStr(k));
+                        Break;
+                    End;
+                Break;
+            End;
+            else Begin  // ParamStr(k) is not a valid argument
+                    FineArgs := False;
+                    Writeln('Invalid argument:', ParamStr(k))
+                 End;
+        End;
+End;
+
+Procedure EditSource;
+// Open a text editor and edit the source code
+VAR
+    EditorPath: String = {$IFDEF LINUX} '/bin/nano' {$ENDIF};
+    i: Byte;
+Begin
+    // {$IFDEF LINUX}
+    For i := 1 to ParamCount do
+        Begin
+        End;
+    // {$ENDIF}
+End;
+
 Procedure ReadDat;
 // Write code to source file
 Var
     i: Byte;
-    t: String;
 Begin
     If ParamStr(1) = '-fs' then Input(ParamStr(2))
     else Begin
@@ -115,7 +156,7 @@ Function Find(s: string): boolean;
 // Find FPC in the given directory s (passed as argument)
 Var
     FileDat: TSearchRec;
-    b: boolean;
+    b: Boolean;
 Begin
     s := s + {$IFDEF MSWINDOWS}'\'{$ENDIF} {$IFDEF LINUX}'/'{$ENDIF};
     Find := DirectoryExists(s);
