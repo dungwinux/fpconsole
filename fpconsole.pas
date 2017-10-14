@@ -76,13 +76,6 @@ Begin
         Writeln(m, #13#10, 'begin');
         Case ParamStr(1) of
             '-f' :  Input(ParamStr(2));
-            // ''   :  Begin 
-            //         Writeln('[INPUT] ( type "//" to stop entering code )');
-            //         Repeat
-            //             Readln(t);
-            //             Writeln(m, t);
-            //         Until t = '//';
-            //         End;
             ''  :   Help;
             else For i := 1 to ParamCount do Writeln(m, ParamStr(i));
         End;
