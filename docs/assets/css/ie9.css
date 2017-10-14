@@ -34,16 +34,16 @@
 	width: auto;
 }
 
-	.statistics:after {
-		content: '';
-		display: block;
-		clear: both;
-	}
+.statistics:after {
+	content: '';
+	display: block;
+	clear: both;
+}
 
-	.statistics li {
-		float: left;
-		padding: 1.5em 2.5em;
-	}
+.statistics li {
+	float: left;
+	padding: 1.5em 2.5em;
+}
 
 /* Footer */
 
