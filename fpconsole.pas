@@ -60,10 +60,10 @@ End;
 
 Function FineArgs:Boolean;
 // Check if the passed arguments are okay
-Const
-    AvailableArgs: Array[1..4] of String = ('-c', , '-f', '-fs', '-h');
 Var
+    AvailableArgs: Array[1..4] of String = ('-c', '-f', '-fs', '-h');
     UsedArgs: Array of String;
+    ArgItem, Arg: String;
     k, j: Byte;
 Begin
     SetLength(UsedArgs, ParamCount);
@@ -79,7 +79,7 @@ Begin
                         Break;
                     End;
                 Break;
-            End;
+            End
             else Begin  // ParamStr(k) is not a valid argument
                     FineArgs := False;
                     Writeln('Invalid argument:', ParamStr(k))
@@ -251,6 +251,7 @@ BEGIN
     TEMPFOLDER := {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF} {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
     Writeln('FPConsole ', Build, ' - Created by Winux8YT3');
     Writeln('TEMP Folder: ', TEMPFOLDER);
+    If Not FineArgs then Halt;
     If ParamStr(1) = '-h' then Help
         else If ParamStr(1) = '-c' then Clear
         else If Create and (Get or SysFind) then Execute else Writeln('FPC NOT FOUND.');
