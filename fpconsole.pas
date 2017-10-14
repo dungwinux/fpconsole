@@ -1,7 +1,10 @@
-uses crt, SysUtils;
+uses crt, SysUtils, DateUtils;
 var
     TEMPFOLDER, Build, dir, fname: AnsiString;
     m: text;
+
+    StartFlag, EndFlag: TDateTime;
+    ExecTime: Double;
 
 procedure InitBuild();
 var s: string;
@@ -160,10 +163,16 @@ Begin
         If IOResult = 0 then begin
             Close(m);
             DeleteFile(fname + '.o');
+            StartFlag := Now;
             exitcode := ExecuteProcess(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF}, '', []);
+            EndFlag := Now;
             DeleteFile(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
+            // This may affects execute time
+            // ExecTime := SecondsBetween(StartFlag, EndFlag);
+            ExecTime := SecondSpan(StartFlag, EndFlag);
             writeln;
-            writeln('---------------------');
+            writeln('--------------------');
+            writeln('Execution Time: ', ExecTime:0:16, ' s');
             writeln('Process Exited with Exit code ', exitcode);
         End
         else Writeln('COMPILE ERROR');
