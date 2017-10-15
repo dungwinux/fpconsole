@@ -66,15 +66,18 @@ Var
     AvailableArgs: Array[1..7] of String = ('-c', '-f', '-fs', '-e', '-edit', '-ec', '-h');
     UsedArgs: Array of String;
     ArgItem, Arg: String;
-    k, j: Byte;
+    k, j, NScannedArgs: Byte;
 Begin
     SetLength(UsedArgs, ParamCount);
+    NScannedArgs := 0;
     FineArgs := True;
     For k := 1 to ParamCount do
         Begin
         For ArgItem in AvailableArgs do
         If ParamStr(k) = ArgItem then  // ParamStr(k) is a valid argument
             Begin
+                Inc(NScannedArgs);
+                UsedArgs[NScannedArgs] := ParamStr(k);  // Add ParamStr(k) to scanned arguments
                 For Arg in UsedArgs do If ParamStr(k) = Arg then  // Duplicate found
                     Begin
                     FineArgs := False;
