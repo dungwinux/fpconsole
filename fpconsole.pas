@@ -1,4 +1,4 @@
-uses crt, SysUtils, DateUtils;
+uses Crt, SysUtils, StrUtils, DateUtils;
 var
     TEMPFOLDER, Build, dir, fname: AnsiString;
     m: text;
@@ -63,42 +63,44 @@ End;
 Function FineArgs: Boolean;
 // Check if the passed arguments are okay
 Var
-    AvailableArgs: Array[1..7] of String = ('-c', '-f', '-fs', '-e', '-edit', '-ec', '-h');
-    UsedArgs: Array of String;
-    ArgItem, Arg: String;
-    k, j, NScannedArgs: Byte;
+    AvailableArgs: Array[1..8] of AnsiString = ('-c', '-f', '-fs', '-e', '-edit', '-ec', '-h', '--no-execute');
+    UsedArgs: Array of AnsiString;
+    k, NScannedArgs: Byte;
 Begin
     SetLength(UsedArgs, ParamCount);
     NScannedArgs := 0;
     FineArgs := True;
-    For k := 1 to ParamCount do
+    For k := 1 to ParamCount do  // Scan arguments. We need to print all the errors, therefore this loop cannot be broken.
         Begin
-        For ArgItem in AvailableArgs do
-        If ParamStr(k) = ArgItem then  // ParamStr(k) is a valid argument
-            Begin
-                Inc(NScannedArgs);
-                UsedArgs[NScannedArgs] := ParamStr(k);  // Add ParamStr(k) to scanned arguments
-                For Arg in UsedArgs do If ParamStr(k) = Arg then  // Duplicate found
-                    Begin
-                    FineArgs := False;
-                    Writeln('Error: Duplicate argument:', ParamStr(k));
-                    Break;
-                    End;
-                If (ParamStr(k) = '-e') or (ParamStr(k) = '-edit') or (ParamStr(k) = '-ec')
-                then Begin
-                     // Check if the user provides the file path (for -e and -edit switch) or the editor path (for -ec switch)
-                     // Also check if the scanning argument is the last argument. If so, that is the same case.
-                     If (Copy(ParamStr(k + 1), 1, 1) = '-') or (k = ParamCount) then
-                        Begin
-                        FineArgs := False;
-                        Writeln('Error: No value specified for the switch', ParamStr(k));
-                        End;
-                     End;
-            End
-        else Begin  // ParamStr(k) is not a valid argument
-             FineArgs := False;
-             Writeln('Error: Invalid argument:', ParamStr(k))
-             End;
+        If AnsiMatchStr(ParamStr(k), UsedArgs)  // If argument is duplicated
+        then Begin
+             If AnsiMatchStr(ParamStr(k), ['-e', '-edit', '-ec'])
+             then Begin
+                  FineArgs := False;
+                  Writeln('Error: Duplicate argument ', ParamStr(k));
+                  End
+             else Writeln('Warning: Duplicate argument ', ParamStr(k));
+             End
+        else If AnsiMatchStr(ParamStr(k), ['-e', '-edit', '-ec'])  // If ParamStr(k) is a switch that needs additional argument
+             then Begin // Check if the next argument is another switch or the switch is already the last argument
+                  If (Copy(ParamStr(k + 1), 1, 1) = '-') or (k = ParamCount)
+                  then Begin
+                       FineArgs := False;
+                       Writeln('Error: No value specified for the switch ', ParamStr(k));
+                       End;
+                  Inc(NScannedArgs);
+                  UsedArgs[NScannedArgs] := ParamStr(k);
+                  End
+             else If AnsiMatchStr(ParamStr(k), AvailableArgs)  // If argument is not a duplicate but is valid
+                  then Begin
+                       Inc(NScannedArgs);
+                       UsedArgs[NScannedArgs] := ParamStr(k);
+                       End
+                  else Begin
+                       // Not a valid argument
+                       FineArgs := False;
+                       Writeln('Error: Invalid argument ', ParamStr(k));
+                       End;
         End;
 End;
 
@@ -106,12 +108,13 @@ Procedure EditSource;
 // Open a text editor and edit the source code
 VAR
     EditorPath: String = {$IFDEF LINUX} '/bin/nano' {$ENDIF};
+    SourceFilePath: String;
     i: Byte;
 Begin
     // {$IFDEF LINUX}
     For i := 1 to ParamCount do
         Begin
-        
+            
         End;
     // {$ENDIF}
 End;
