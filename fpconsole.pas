@@ -60,10 +60,10 @@ Begin
     End;
 End;
 
-Function FineArgs:Boolean;
+Function FineArgs: Boolean;
 // Check if the passed arguments are okay
 Var
-    AvailableArgs: Array[1..4] of String = ('-c', '-f', '-fs', '-h');
+    AvailableArgs: Array[1..7] of String = ('-c', '-f', '-fs', '-e', '-edit', '-ec', '-h');
     UsedArgs: Array of String;
     ArgItem, Arg: String;
     k, j: Byte;
@@ -72,20 +72,30 @@ Begin
     FineArgs := True;
     For k := 1 to ParamCount do
         Begin
-            For ArgItem in AvailableArgs do If ParamStr(k) = ArgItem then  // ParamStr(k) is a valid argument
+        For ArgItem in AvailableArgs do
+        If ParamStr(k) = ArgItem then  // ParamStr(k) is a valid argument
             Begin
-                For Arg in UsedArgs do If ParamStr(k) = Arg then
+                For Arg in UsedArgs do If ParamStr(k) = Arg then  // Duplicate found
                     Begin
-                        FineArgs := False;
-                        Writeln('Duplicate argument:', ParamStr(k));
-                        Break;
-                    End;
-                Break;
-            End
-            else Begin  // ParamStr(k) is not a valid argument
                     FineArgs := False;
-                    Writeln('Invalid argument:', ParamStr(k))
-                 End;
+                    Writeln('Error: Duplicate argument:', ParamStr(k));
+                    Break;
+                    End;
+                If (ParamStr(k) = '-e') or (ParamStr(k) = '-edit') or (ParamStr(k) = '-ec')
+                then Begin
+                     // Check if the user provides the file path (for -e and -edit switch) or the editor path (for -ec switch)
+                     // Also check if the scanning argument is the last argument. If so, that is the same case.
+                     If (Copy(ParamStr(k + 1), 1, 1) = '-') or (k = ParamCount) then
+                        Begin
+                        FineArgs := False;
+                        Writeln('Error: No value specified for the switch', ParamStr(k));
+                        End;
+                     End;
+            End
+        else Begin  // ParamStr(k) is not a valid argument
+             FineArgs := False;
+             Writeln('Error: Invalid argument:', ParamStr(k))
+             End;
         End;
 End;
 
@@ -98,6 +108,7 @@ Begin
     // {$IFDEF LINUX}
     For i := 1 to ParamCount do
         Begin
+        
         End;
     // {$ENDIF}
 End;
@@ -261,5 +272,7 @@ BEGIN
     If Not FineArgs then Halt;
     If ParamStr(1) = '-h' then Help
         else If ParamStr(1) = '-c' then Clear
-        else If Create and (Get or SysFind) then Execute else Writeln('FPC NOT FOUND.');
+        else If FineArgs then Begin
+                              If Create and (Get or SysFind) then Execute else Writeln('FPC NOT FOUND.');
+                              End else Halt(1);
 END.
