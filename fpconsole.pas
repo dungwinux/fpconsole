@@ -1,18 +1,20 @@
-USES CRT, SysUtils;
-VAR
+uses crt, SysUtils, DateUtils;
+var
     TEMPFOLDER, Build, dir, fname: AnsiString;
     m: text;
 
-Procedure InitBuild();
-Var s: String;
-Begin
-    s := {$I %DATE%}+'-'+{$I %TIME%};
-    While pos('/',s) <> 0 do Delete(s, pos('/', s), 1);
-    While pos(':',s) <> 0 do Delete(s, pos(':', s), 1);
-    Delete(s, 1, 2);
-    Delete(s, length(s) - 1, 2);
-    Build := s;
-End;
+    StartFlag, EndFlag: TDateTime;
+    ExecTime: Double;
+
+procedure InitBuild();
+var s: string;
+begin
+    s:={$I %DATE%}+'-'+{$I %TIME%};
+	while pos('/',s) <> 0 do delete(s,pos('/',s),1);
+	while pos(':',s) <> 0 do delete(s,pos(':',s),1);
+    delete(s,1,2);delete(s,length(s)-1,2);
+    Build:=s;
+end;
 
 Procedure Help;
 Begin
@@ -198,16 +200,21 @@ Begin
         Writeln('[OUTPUT]');
         Assign(m, fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
         {$I-} Reset(m); {$I+}
-        If IOResult = 0 then 
-            Begin
-                Close(m);
-                DeleteFile(fname + '.o');
-                exitcode := ExecuteProcess(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF}, '', []);
-                DeleteFile(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
-                Writeln;
-                Writeln('---------------------');
-                Writeln('Process terminated with exit code ', exitcode);
-            End
+        If IOResult = 0 then begin
+            Close(m);
+            DeleteFile(fname + '.o');
+            StartFlag := Now;
+            exitcode := ExecuteProcess(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF}, '', []);
+            EndFlag := Now;
+            DeleteFile(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
+            // This may affects execute time
+            // ExecTime := SecondsBetween(StartFlag, EndFlag);
+            ExecTime := SecondSpan(StartFlag, EndFlag);
+            writeln;
+            writeln('--------------------');
+            writeln('Execution Time: ', ExecTime:0:16, ' s');
+            writeln('Process Exited with Exit code ', exitcode);
+        End
         else Writeln('COMPILE ERROR');
     End;
 End;
