@@ -107,16 +107,28 @@ End;
 Procedure EditSource;
 // Open a text editor and edit the source code
 VAR
-    EditorPath: String = {$IFDEF LINUX} '/bin/nano' {$ENDIF};
-    SourceFilePath: String;
+    EditorPath: AnsiString = {$IFDEF LINUX} '/bin/nano' {$ENDIF};
+    SourceFilePath: AnsiString;
     i: Byte;
 Begin
+    SourceFilePath := TEMPFOLDER;
     // {$IFDEF LINUX}
     For i := 1 to ParamCount do
-        Begin
-            
+        Case ParamStr(i) of
+            '-e': SourceFilePath := SourceFilePath + ParamStr(i + 1);
+            '-edit': {$IFDEF LINUX}
+                     If Copy(ParamStr(i + 1), 1, 1) = '/'  // User provides full path
+                     then SourceFilePath := ParamStr(i + 1)
+                     else SourceFilePath := GetCurrentDir + ParamStr(i + 1);  // User provides path in local directory
+                     {$ENDIF}
+            '-ec': {$IFDEF LINUX}
+                   If Copy(ParamStr(i + 1), 1, 1) = '/'  // Full path
+                   then EditorPath := ParamStr(i + 1)
+                   else EditorPath := GetCurrentDir + ParamStr(i + 1);  // Local path
+                   {$ENDIF}
         End;
     // {$ENDIF}
+    ExecuteProcess(EditorPath, [SourceFilePath], []);
 End;
 
 Procedure ReadDat;
