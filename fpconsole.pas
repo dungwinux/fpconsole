@@ -65,7 +65,7 @@ Function StrInList(s: AnsiString; A: Array of AnsiString; b: Byte): Boolean;
 VAR i: Byte;
 Begin
     StrInList := False;
-    For i := 1 to b do If A[i] = s then Begin
+    For i := 0 to b do If A[i] = s then Begin
                                         StrInList := True;
                                         Break;
                                         End;
@@ -85,14 +85,14 @@ Begin
         Begin
         If StrInList(ParamStr(k), UsedArgs, NScannedArgs)  // If argument is duplicated
         then Begin
-             If StrInList(ParamStr(k), ['-e', '-edit', '-ec'], 3)
+             If StrInList(ParamStr(k), ['-e', '-edit', '-ec'], 2)
              then Begin
                   FineArgs := False;
                   Writeln('Error: Duplicate argument ', ParamStr(k));
                   End
              else Writeln('Warning: Duplicate argument ', ParamStr(k));
              End
-        else If StrInList(ParamStr(k), ['-e', '-edit', '-ec'], 3)  // If ParamStr(k) is a switch that needs additional argument
+        else If StrInList(ParamStr(k), ['-e', '-edit', '-ec'], 2)  // If ParamStr(k) is a switch that needs additional argument
              then Begin // Check if the next argument is another switch or the switch is already the last argument
                   Inc(NScannedArgs);
                   UsedArgs[NScannedArgs] := ParamStr(k);
