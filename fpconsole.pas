@@ -78,6 +78,7 @@ Var
     UsedArgs: Array[1..5] of AnsiString;
     k, NScannedArgs: Byte;
 Begin
+    If Copy(ParamStr(1), 1, 1) <> '-' then Exit(True);  // Assuming ParamStr(1) till the end is code
     NScannedArgs := 0;
     FineArgs := True;
     k := 1;
@@ -85,14 +86,14 @@ Begin
         Begin
         If StrInList(ParamStr(k), UsedArgs, NScannedArgs)  // If argument is duplicated
         then Begin
-             If StrInList(ParamStr(k), ['-e', '-edit', '-ec'], 2)
+             If StrInList(ParamStr(k), ['-f', '-fs', '-e', '-edit', '-ec'], 4)
              then Begin
                   FineArgs := False;
                   Writeln('Error: Duplicate argument ', ParamStr(k));
                   End
              else Writeln('Warning: Duplicate argument ', ParamStr(k));
              End
-        else If StrInList(ParamStr(k), ['-e', '-edit', '-ec'], 2)  // If ParamStr(k) is a switch that needs additional argument
+        else If StrInList(ParamStr(k), ['-f', '-fs', '-e', '-edit', '-ec'], 4)  // If ParamStr(k) is a switch that needs additional argument
              then Begin // Check if the next argument is another switch or the switch is already the last argument
                   Inc(NScannedArgs);
                   UsedArgs[NScannedArgs] := ParamStr(k);
@@ -128,7 +129,7 @@ Begin
     // {$IFDEF LINUX}
     For i := 1 to ParamCount do
         Case ParamStr(i) of
-            '-e': SourceFilePath := SourceFilePath + ParamStr(i + 1);
+            '-e': SourceFilePath := SourceFilePath + '/' + ParamStr(i + 1);
             '-edit': {$IFDEF LINUX}
                      If Copy(ParamStr(i + 1), 1, 1) = '/'  // User provides full path
                      then SourceFilePath := ParamStr(i + 1)
@@ -141,6 +142,7 @@ Begin
                    {$ENDIF}
         End;
     // {$ENDIF}
+    fname := Copy(SourceFilePath, 1, Length(SourceFilePath) - 4);
     ExecuteProcess(EditorPath, [SourceFilePath], []);
 End;
 
@@ -232,7 +234,6 @@ Procedure Execute(SourceFileName: AnsiString);
 Var exitcode: integer;
 Begin
     Writeln('FPC Dir:', dir);
-    ReadDat;
     If (ParamStr(1) <> '') then 
     Begin
         {$IFDEF MSWINDOWS}ExecuteProcess(dir, ['-v0', SourceFileName], []);{$ENDIF}
@@ -307,10 +308,19 @@ BEGIN
     If ParamStr(1) = '-h' then Help
         else If ParamStr(1) = '-c' then Clear
         else Begin
-             If Create and (Get or SysFind)
+             If StrInList('-edit', [ParamStr(1), ParamStr(2), ParamStr(3), ParamStr(4), ParamStr(5)], 4)
              then Begin
-                 Execute(fname);
-                 End
+                  EditSource;
+                  If ParamStr(ParamCount) <> '--no-execute' then Execute(fname);
+                  End
+             else If StrInList('-e', [ParamStr(1), ParamStr(2), ParamStr(3), ParamStr(4), ParamStr(5)], 4)
+                  then Begin
+                       EditSource;
+                       Execute(fname);
+                       End else If Create and (Get or SysFind) then Begin
+                                                                    ReadDat;
+                                                                    Execute(fname);
+                                                                    End
              else Writeln('FPC NOT FOUND.');
              End;
 END.
