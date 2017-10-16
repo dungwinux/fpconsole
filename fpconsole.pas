@@ -22,10 +22,14 @@ Begin
     Writeln('To make it easy, you can directly throw input as the argument or write it in a file');
     Writeln('Sometimes, when there is an error or an infinite loop and the program exited improperly, you can review the code in %TMP%\FPConsole folder');
     Writeln('All FPConsole Switch:');
-    Writeln('-c  :   Clear TEMP');
-    Writeln('-fs :   Read the whole file in formatted type (.pas)');
-    Writeln('-f  :   Read text file with only Function and Procedure');
-    Writeln('-h  :   Show this help');
+    Writeln('-c    :   Clear temporary folder (' + TEMPFOLDER + ')');
+    Writeln('-fs   :   Read the whole file in formatted type (.pas)');
+    Writeln('-f    :   Read text file with only Function and Procedure');
+    Writeln('-e    :   Edit a source file in the temporary folder (' + TEMPFOLDER + ')');
+    Writeln('-edit :   Edit a source file given its path');
+    Writeln('--no-execute : No executing the program after editing the source file, can only be used with -edit switch only & must provide as the last argument');
+    Writeln('-ec   :   Specify the path of the text editor of your own choice, can only be used with -e and -edit switches only');
+    Writeln('-h    :   Show this help');
     Writeln('FPConsole is an Open-Source Program. Github: fpconsole');
 End;
 
@@ -229,7 +233,7 @@ Begin
     Writeln('Find FPC (Custom):', SysFind);
 End;
 
-Procedure Execute(SourceFileName: AnsiString);
+Procedure Execute(SourceFileName: AnsiString; DelSrcFile: Boolean);
 // Compile & Execute the source code (source file is holded by the m variable)
 Var exitcode: integer;
 Begin
@@ -238,7 +242,7 @@ Begin
     Begin
         {$IFDEF MSWINDOWS}ExecuteProcess(dir, ['-v0', SourceFileName], []);{$ENDIF}
         {$IFDEF LINUX}ExecuteProcess('/bin/bash', ['-c', 'fpc ' + SourceFileName + ' &>/dev/null']);{$ENDIF}
-        DeleteFile(SourceFileName + '.pas');
+        If DelSrcFile then DeleteFile(SourceFileName + '.pas');
         Writeln('[OUTPUT]');
         Assign(m, SourceFileName {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
         {$I-} Reset(m); {$I+}
@@ -311,15 +315,15 @@ BEGIN
              If StrInList('-edit', [ParamStr(1), ParamStr(2), ParamStr(3), ParamStr(4), ParamStr(5)], 4)
              then Begin
                   EditSource;
-                  If ParamStr(ParamCount) <> '--no-execute' then Execute(fname);
+                  If ParamStr(ParamCount) <> '--no-execute' then Execute(fname, False);
                   End
              else If StrInList('-e', [ParamStr(1), ParamStr(2), ParamStr(3), ParamStr(4), ParamStr(5)], 4)
                   then Begin
                        EditSource;
-                       Execute(fname);
+                       Execute(fname, False);
                        End else If Create and (Get or SysFind) then Begin
                                                                     ReadDat;
-                                                                    Execute(fname);
+                                                                    Execute(fname, True);
                                                                     End
              else Writeln('FPC NOT FOUND.');
              End;
