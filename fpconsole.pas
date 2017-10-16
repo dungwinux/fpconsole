@@ -1,4 +1,4 @@
-uses Crt, SysUtils, StrUtils, DateUtils;
+uses Crt, SysUtils, DateUtils;
 var
     TEMPFOLDER, Build, dir, fname: AnsiString;
     m: text;
@@ -60,38 +60,50 @@ Begin
     End;
 End;
 
+Function StrInList(s: AnsiString; A: Array of AnsiString; b: Byte): Boolean;
+// Check if an ANSI string is presented in the first b elements of array A
+VAR i: Byte;
+Begin
+    StrInList := False;
+    For i := 1 to b do If A[i] = s then Begin
+                                        StrInList := True;
+                                        Break;
+                                        End;
+End;
+
 Function FineArgs: Boolean;
 // Check if the passed arguments are okay
 Var
     AvailableArgs: Array[1..8] of AnsiString = ('-c', '-f', '-fs', '-e', '-edit', '-ec', '-h', '--no-execute');
-    UsedArgs: Array of AnsiString;
+    UsedArgs: Array[1..5] of AnsiString;
     k, NScannedArgs: Byte;
 Begin
-    SetLength(UsedArgs, ParamCount);
     NScannedArgs := 0;
     FineArgs := True;
-    For k := 1 to ParamCount do  // Scan arguments. We need to print all the errors, therefore this loop cannot be broken.
+    k := 1;
+    While k <= ParamCount do  // Scan arguments. We need to print all the errors, therefore this loop cannot be broken.
         Begin
-        If AnsiMatchStr(ParamStr(k), UsedArgs)  // If argument is duplicated
+        If StrInList(ParamStr(k), UsedArgs, NScannedArgs)  // If argument is duplicated
         then Begin
-             If AnsiMatchStr(ParamStr(k), ['-e', '-edit', '-ec'])
+             If StrInList(ParamStr(k), ['-e', '-edit', '-ec'], 3)
              then Begin
                   FineArgs := False;
                   Writeln('Error: Duplicate argument ', ParamStr(k));
                   End
              else Writeln('Warning: Duplicate argument ', ParamStr(k));
              End
-        else If AnsiMatchStr(ParamStr(k), ['-e', '-edit', '-ec'])  // If ParamStr(k) is a switch that needs additional argument
+        else If StrInList(ParamStr(k), ['-e', '-edit', '-ec'], 3)  // If ParamStr(k) is a switch that needs additional argument
              then Begin // Check if the next argument is another switch or the switch is already the last argument
+                  Inc(NScannedArgs);
+                  UsedArgs[NScannedArgs] := ParamStr(k);
                   If (Copy(ParamStr(k + 1), 1, 1) = '-') or (k = ParamCount)
                   then Begin
                        FineArgs := False;
                        Writeln('Error: No value specified for the switch ', ParamStr(k));
-                       End;
-                  Inc(NScannedArgs);
-                  UsedArgs[NScannedArgs] := ParamStr(k);
+                       End
+                  else Inc(k);
                   End
-             else If AnsiMatchStr(ParamStr(k), AvailableArgs)  // If argument is not a duplicate but is valid
+             else If StrInList(ParamStr(k), AvailableArgs, Length(AvailableArgs))  // If argument is not a duplicate but is valid
                   then Begin
                        Inc(NScannedArgs);
                        UsedArgs[NScannedArgs] := ParamStr(k);
@@ -101,6 +113,7 @@ Begin
                        FineArgs := False;
                        Writeln('Error: Invalid argument ', ParamStr(k));
                        End;
+        Inc(k);
         End;
 End;
 
@@ -214,28 +227,27 @@ Begin
     Writeln('Find FPC (Custom):', SysFind);
 End;
 
-Procedure Execute;
+Procedure Execute(SourceFileName: AnsiString);
 // Compile & Execute the source code (source file is holded by the m variable)
 Var exitcode: integer;
 Begin
     Writeln('FPC Dir:', dir);
     ReadDat;
-    If (ParamStr(1)<>'') then 
+    If (ParamStr(1) <> '') then 
     Begin
-        {$IFDEF MSWINDOWS}ExecuteProcess(dir, ['-v0', fname], []);{$ENDIF}
-        {$IFDEF LINUX}ExecuteProcess('/bin/bash', ['-c', 'fpc ' + fname + ' &>/dev/null']);{$ENDIF}
-        DeleteFile(fname + '.pas');
-
+        {$IFDEF MSWINDOWS}ExecuteProcess(dir, ['-v0', SourceFileName], []);{$ENDIF}
+        {$IFDEF LINUX}ExecuteProcess('/bin/bash', ['-c', 'fpc ' + SourceFileName + ' &>/dev/null']);{$ENDIF}
+        DeleteFile(SourceFileName + '.pas');
         Writeln('[OUTPUT]');
-        Assign(m, fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
+        Assign(m, SourceFileName {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
         {$I-} Reset(m); {$I+}
         If IOResult = 0 then begin
             Close(m);
-            DeleteFile(fname + '.o');
+            DeleteFile(SourceFileName + '.o');
             StartFlag := Now;
-            exitcode := ExecuteProcess(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF}, '', []);
+            exitcode := ExecuteProcess(SourceFileName {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF}, '', []);
             EndFlag := Now;
-            DeleteFile(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
+            DeleteFile(SourceFileName {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
             // This may affects execute time
             // ExecTime := SecondsBetween(StartFlag, EndFlag);
             ExecTime := SecondSpan(StartFlag, EndFlag);
@@ -288,9 +300,17 @@ BEGIN
     Writeln('FPConsole ', Build, ' - Created by Winux8YT3');
     Writeln('TEMP Folder: ', TEMPFOLDER);
     If Not FineArgs then Halt;
+    If ParamCount > 5 then Begin
+                           Writeln('Error: Too many arguments');
+                           Halt(1);
+                           End;
     If ParamStr(1) = '-h' then Help
         else If ParamStr(1) = '-c' then Clear
-        else If FineArgs then Begin
-                              If Create and (Get or SysFind) then Execute else Writeln('FPC NOT FOUND.');
-                              End else Halt(1);
+        else Begin
+             If Create and (Get or SysFind)
+             then Begin
+                 Execute(fname);
+                 End
+             else Writeln('FPC NOT FOUND.');
+             End;
 END.
