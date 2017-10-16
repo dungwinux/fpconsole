@@ -299,11 +299,11 @@ BEGIN
     TEMPFOLDER := {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF} {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
     Writeln('FPConsole ', Build, ' - Created by Winux8YT3');
     Writeln('TEMP Folder: ', TEMPFOLDER);
-    If Not FineArgs then Halt;
     If ParamCount > 5 then Begin
                            Writeln('Error: Too many arguments');
                            Halt(1);
                            End;
+    If Not FineArgs then Halt;
     If ParamStr(1) = '-h' then Help
         else If ParamStr(1) = '-c' then Clear
         else Begin
