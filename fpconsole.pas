@@ -5,38 +5,37 @@
 
 uses Crt, SysUtils, DateUtils;
 var
-    TEMPFOLDER, Build, dir, fname: AnsiString;
-    m: text;
+TEMPFOLDER, Build, dir, fname: AnsiString;
+m: text;
 
-    StartFlag, EndFlag: TDateTime;
-    ExecTime: Double;
+StartFlag, EndFlag: TDateTime;
+ExecTime: Double;
 
 procedure InitBuild();
 var s: string;
 begin
-    s:={$I %DATE%}+'-'+{$I %TIME%};
-	while pos('/',s) <> 0 do delete(s,pos('/',s),1);
-	while pos(':',s) <> 0 do delete(s,pos(':',s),1);
-    delete(s,1,2);delete(s,length(s)-1,2);
-    Build:=s;
+s:={$I %DATE%}+'-'+{$I %TIME%};
+while pos('/',s) <> 0 do delete(s,pos('/',s),1);
+while pos(':',s) <> 0 do delete(s,pos(':',s),1);
+delete(s,1,2);delete(s,length(s)-1,2);
+Build:=s;
 end;
 
 Procedure Help;
 Begin
-    Writeln('INFO: FPConsole is a tool that helps you directly write input and get output with the Free Pascal Compiler');
-    Writeln('To make it easy, you can directly throw input as the argument or write it in a file');
-    Writeln('Sometimes, when there is an error or an infinite loop and the program exited improperly, you can review the code in %TMP%\FPConsole folder');
-    Writeln('FPConsole''s temporary folder: ', TEMPFOLDER);
+    Writeln('INFO: FPConsole is a tool that helps you directly input codes and get output with the Free Pascal Compiler');
+    Writeln('To make it easy, you can directly throw codes as the argument or write it in a file');
+    Writeln('Sometimes, when there is an error or an infinite loop and the program exited improperly, you can review the code in Temp folder folder');
     Writeln('All FPConsole Switch:');
     Writeln('-c    :   Clear temporary folder');
     Writeln('-fs   :   Read the whole file in formatted type (.pas)');
     Writeln('-f    :   Read text file with only Function and Procedure');
     Writeln('-e    :   Edit a source file in the temporary folder');
     Writeln('-edit :   Edit a source file given its path');
-    Writeln('    --no-execute : No executing the program after editing the source file, can only be used with -edit switch only & must provide as the last argument');
+    Writeln('    --no-execute : No executing the program after editing the source file (used with -edit switch only & provide as the last argument)');
     Writeln('-ec   :   Specify the path of the text editor of your own choice, can only be used with -e and -edit switches only');
     Writeln('-h    :   Show this help');
-    Writeln('FPConsole is an Open-Source Program. Github: fpconsole');
+    Writeln('FPConsole is an Open-Source Program. Github: dungwinux/fpconsole');
 End;
 
 Function Create: Boolean;
@@ -48,7 +47,8 @@ Begin
     fname := '_' + fname;
     tmp := TEMPFOLDER;
     Create := (DirectoryExists(tmp)) or (CreateDir(tmp));
-    If Create then Begin
+    If Create then 
+    Begin
         fname := tmp + {$IFDEF MSWINDOWS}'\'{$ENDIF} {$IFDEF LINUX}'/'{$ENDIF} + fname;
         Assign(m, fname + '.pas');
         Rewrite(m);
@@ -61,8 +61,10 @@ Var f: text;
 Begin
     Assign(f, s);
     {$I-} Reset(f); {$I+}
-    If IOResult = 0 then Begin
-        While not EOF(f) do Begin
+    If IOResult = 0 then 
+    Begin
+        While not EOF(f) do 
+        Begin
             Readln(f, s);  
             Writeln(m, s);  
         End;
@@ -75,11 +77,12 @@ Function StrInList(s: AnsiString; A: Array of AnsiString; b: Byte): Boolean;
 VAR i: Byte;
 Begin
     StrInList := False;
-    For i := 0 to b do If A[i] = s then
-    Begin
-        StrInList := True;
-        Break;
-    End;
+    For i := 0 to b do 
+        If A[i] = s then
+            Begin
+                StrInList := True;
+                Break;
+            End;
 End;
 
 Function FineArgs: Boolean;
@@ -95,45 +98,46 @@ Begin
     k := 1;
     While k <= ParamCount do  // Scan arguments. We need to print all the errors, therefore this loop cannot be broken.
         Begin
-        If StrInList(ParamStr(k), UsedArgs, NScannedArgs)  // If argument is duplicated
-        then Begin
-             If StrInList(ParamStr(k), ['-f', '-fs', '-e', '-edit', '-ec'], 4)
-             then Begin
-                  FineArgs := False;
-                  Writeln('Error: Duplicate argument ', ParamStr(k));
-                  End
-             else Writeln('Warning: Duplicate argument ', ParamStr(k));
-             End
-        else If StrInList(ParamStr(k), ['-f', '-fs', '-e', '-edit', '-ec'], 4)  // If ParamStr(k) is a switch that needs additional argument
-             then Begin // Check if the next argument is another switch or the switch is already the last argument
-                  Inc(NScannedArgs);
-                  UsedArgs[NScannedArgs] := ParamStr(k);
-                  If (Copy(ParamStr(k + 1), 1, 1) = '-') or (k = ParamCount)
-                  then Begin
-                       FineArgs := False;
-                       Writeln('Error: No value specified for the switch ', ParamStr(k));
-                       End
-                  else Inc(k);
-                  End
-             else If StrInList(ParamStr(k), AvailableArgs, Length(AvailableArgs))  // If argument is not a duplicate but is valid
-                  then Begin
-                       Inc(NScannedArgs);
-                       UsedArgs[NScannedArgs] := ParamStr(k);
-                       End
-                  else Begin
-                       // Not a valid argument
-                       FineArgs := False;
-                       Writeln('Error: Invalid argument ', ParamStr(k));
-                       End;
+        If StrInList(ParamStr(k), UsedArgs, NScannedArgs) then // If argument is duplicated
+            Begin
+                If StrInList(ParamStr(k), ['-f', '-fs', '-e', '-edit', '-ec'], 4) then 
+                Begin
+                    FineArgs := False;
+                    Writeln('Error: Duplicate argument ', ParamStr(k));
+                End
+                else Writeln('Warning: Duplicate argument ', ParamStr(k));
+            End
+        else If StrInList(ParamStr(k), ['-f', '-fs', '-e', '-edit', '-ec'], 4) then  // If ParamStr(k) is a switch that needs additional argument
+            Begin // Check if the next argument is another switch or the switch is already the last argument
+                Inc(NScannedArgs);
+                UsedArgs[NScannedArgs] := ParamStr(k);
+                If (Copy(ParamStr(k + 1), 1, 1) = '-') or (k = ParamCount) then 
+                Begin
+                    FineArgs := False;
+                    Writeln('Error: No value specified for the switch ', ParamStr(k));
+                End
+                else Inc(k);
+            End
+            else If StrInList(ParamStr(k), AvailableArgs, Length(AvailableArgs))  // If argument is not a duplicate but is validthen 
+            Begin
+                Inc(NScannedArgs);
+                UsedArgs[NScannedArgs] := ParamStr(k);
+            End
+            else 
+            Begin
+                // Not a valid argument
+                FineArgs := False;
+                Writeln('Error: Invalid argument ', ParamStr(k));
+            End;
         Inc(k);
         End;
     // Check if -ec switch is called but neither -e not -edit is
     If (StrInList('-ec', UsedArgs, Length(UsedArgs)))
-       and ((not StrInList('-e', UsedArgs, Length(UsedArgs))) or (not StrInList('-edit', UsedArgs, Length(UsedArgs))))
-    then Begin
-         FineArgs := False;
-         Writeln('Error: The path to source file is not specified');
-         End;
+        and ((not StrInList('-e', UsedArgs, Length(UsedArgs))) or (not StrInList('-edit', UsedArgs, Length(UsedArgs)))) then 
+    Begin
+        FineArgs := False;
+        Writeln('Error: The path to source file is not specified');
+    End;
 End;
 
 Procedure EditSource;
@@ -147,30 +151,30 @@ Begin
     For i := 1 to ParamCount do
         Case ParamStr(i) of
             '-e': SourceFilePath := SourceFilePath + '/' + ParamStr(i + 1);
-            '-edit': begin
-                    {$IFDEF LINUX}
-                        If Copy(ParamStr(i + 1), 1, 1) = '/'  // User provides full path
-                        then SourceFilePath := ParamStr(i + 1)
-                        else SourceFilePath := GetCurrentDir + ParamStr(i + 1);  // User provides path in local directory
-                    {$ENDIF}
-                    end;
-            '-ec':  begin
-                    {$IFDEF LINUX}
-                        If Copy(ParamStr(i + 1), 1, 1) = '/'  // Full path
-                        then EditorPath := ParamStr(i + 1)
-                        else EditorPath := GetCurrentDir + ParamStr(i + 1);  // Local path
-                    {$ENDIF}
-                    end;
+            '-edit':    begin
+                        {$IFDEF LINUX}
+                            If Copy(ParamStr(i + 1), 1, 1) = '/'  // User provides full path
+                            then SourceFilePath := ParamStr(i + 1)
+                            else SourceFilePath := GetCurrentDir + ParamStr(i + 1);  // User provides path in local directory
+                        {$ENDIF}
+                        end;
+            '-ec':      begin
+                        {$IFDEF LINUX}
+                            If Copy(ParamStr(i + 1), 1, 1) = '/'  // Full path
+                            then EditorPath := ParamStr(i + 1)
+                            else EditorPath := GetCurrentDir + ParamStr(i + 1);  // Local path
+                        {$ENDIF}
+                        end;
         End;
     If not FileExists(SourceFilePath) or not FileExists(EditorPath)
     then Begin
-         Writeln('Error: Path to source file or path to editor that you have specified does not exist');
-         Halt(1);
-         End
+        Writeln('Error: Path to source file or path to editor that you have specified does not exist');
+        Halt(1);
+    End
     else Begin
-         fname := Copy(SourceFilePath, 1, Length(SourceFilePath) - 4);
-         ExecuteProcess(EditorPath, [SourceFilePath], []);
-         End;
+        fname := Copy(SourceFilePath, 1, Length(SourceFilePath) - 4);
+        ExecuteProcess(EditorPath, [SourceFilePath], []);
+    End;
 End;
 
 Procedure ReadDat;
@@ -180,22 +184,22 @@ Var
 Begin
     If ParamStr(1) = '-fs' then Input(ParamStr(2))
     else Begin
-         Write(m, 'uses ');
-         Input('unit.dat');  // Get unit
-         Writeln(m, 'crt;');
-         Writeln(m, #13#10, 'type', #13#10, 'Int = Integer;');
-         Input('type.dat');  // Get type
-         Writeln(m, #13#10, 'const', #13#10, '_Default=', #39, 'FPConsole', #39, ';');
-         Input('const.dat'); // Get const
-         Writeln(m, #13#10, 'var', #13#10, '_nuStr:string;', #13#10, '_nInt:integer;', #13#10, '_nReal:real;', #13#10, '_nText:text;');
-         Input('var.dat');   // Get var
-         Writeln(m, #13#10, 'begin');
-         Case ParamStr(1) of
+        Write(m, 'uses ');
+        Input('unit.dat');  // Get unit
+        Writeln(m, 'crt;');
+        Writeln(m, #13#10, 'type', #13#10, 'Int = Integer;');
+        Input('type.dat');  // Get type
+        Writeln(m, #13#10, 'const', #13#10, '_Default=', #39, 'FPConsole', #39, ';');
+        Input('const.dat'); // Get const
+        Writeln(m, #13#10, 'var', #13#10, '_nuStr:string;', #13#10, '_nInt:integer;', #13#10, '_nReal:real;', #13#10, '_nText:text;');
+        Input('var.dat');   // Get var
+        Writeln(m, #13#10, 'begin');
+        Case ParamStr(1) of
             '-f' :  Input(ParamStr(2));
             ''   :  Help;
-         else For i := 1 to ParamCount do Writeln(m, ParamStr(i));
-         End;
-    Write(m, 'end.');
+            else For i := 1 to ParamCount do Writeln(m, ParamStr(i));
+        End;
+        Write(m, 'end.');
     End;
     Close(m); 
 End;
@@ -209,8 +213,8 @@ Begin
     If Get then Begin
                 If FindFirst('C:\FPC\*', faDirectory, FileDat) = 0 
                     then Repeat
-                         dir := FileDat.Name;
-                         Until FindNext(FileDat) <> 0;
+                            dir := FileDat.Name;
+                            Until FindNext(FileDat) <> 0;
                 FindClose(FileDat);
                 If dir = '..' then Get := False
                     else dir := 'C:\FPC\' + dir + '\bin\i386-win32\fpc.exe';
@@ -228,8 +232,8 @@ End;
 Function Find(s: string): boolean;
 // Find FPC in the given directory s (passed as argument)
 Var
-    FileDat: TSearchRec;
-    b: Boolean;
+FileDat: TSearchRec;
+b: Boolean;
 Begin
     s := s + {$IFDEF MSWINDOWS}'\'{$ENDIF} {$IFDEF LINUX}'/'{$ENDIF};
     Find := DirectoryExists(s);
@@ -269,7 +273,8 @@ Begin
         Writeln('[OUTPUT]');
         Assign(m, SourceFileName {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
         {$I-} Reset(m); {$I+}
-        If IOResult = 0 then begin
+        If IOResult = 0 then
+        begin
             Close(m);
             DeleteFile(SourceFileName + '.o');
             StartFlag := Now;
@@ -327,28 +332,31 @@ BEGIN
     TEMPFOLDER := {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF} {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
     Writeln('FPConsole ', Build, ' - Created by Winux8YT3');
     Writeln('TEMP Folder: ', TEMPFOLDER);
-    If ParamCount > 5 then Begin
-                           Writeln('Error: Too many arguments');
-                           Halt(1);
-                           End;
+    If ParamCount > 5 then 
+    begin
+        Writeln('Error: Too many arguments');
+        Halt(1);
+    End;
     If Not FineArgs then Halt;
     If ParamStr(1) = '-h' then Help
         else If ParamStr(1) = '-c' then Clear
         else Begin
-             If StrInList('-edit', [ParamStr(1), ParamStr(2), ParamStr(3), ParamStr(4), ParamStr(5)], 4)
-             then Begin
-                  EditSource;
-                  If ParamStr(ParamCount) <> '--no-execute' then Execute(fname, False);
-                  End
-             else If StrInList('-e', [ParamStr(1), ParamStr(2), ParamStr(3), ParamStr(4), ParamStr(5)], 4)
-                  then Begin
-                       EditSource;
-                       Execute(fname, False);
-                       End else If Create and (Get or SysFind) then Begin
-                                                                    ReadDat;
-                                                                    Execute(fname, True);
-                                                                    End
-             else Writeln('FPC NOT FOUND.');
-             End;
+            If StrInList('-edit', [ParamStr(1), ParamStr(2), ParamStr(3), ParamStr(4), ParamStr(5)], 4) then
+            Begin
+                EditSource;
+                If ParamStr(ParamCount) <> '--no-execute' then Execute(fname, False);
+            End
+            else If StrInList('-e', [ParamStr(1), ParamStr(2), ParamStr(3), ParamStr(4), ParamStr(5)], 4)then
+            Begin
+                EditSource;
+                Execute(fname, False);
+            End else 
+                If Create and (Get or SysFind) then 
+                Begin
+                    ReadDat;
+                    Execute(fname, True);
+                End
+                else Writeln('FPC NOT FOUND.');
+            End;
 END.
 
