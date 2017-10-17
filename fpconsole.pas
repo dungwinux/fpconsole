@@ -151,38 +151,46 @@ VAR
     SourceFilePath: AnsiString;
     i: Byte;
 Begin
-    EditorPath:= {$IFDEF MSWINDOWS} GetEnvironmentVariable('windir') + 'C:\Windows\notepad.exe'{$ENDIF} {$IFDEF LINUX} '/bin/nano' {$ENDIF};
+    EditorPath:= {$IFDEF MSWINDOWS} GetEnvironmentVariable('windir') + '\notepad.exe'{$ENDIF} {$IFDEF LINUX} '/bin/nano' {$ENDIF};
     SourceFilePath := TEMPFOLDER;
-    For i := 1 to ParamCount do
-        Case ParamStr(i) of
-            '-e': SourceFilePath := SourceFilePath + slash + ParamStr(i + 1);
-            '-edit':    begin
-                        // {$IFDEF LINUX}
-                            If Copy(ParamStr(i + 1), 1, 1) = slash  // User provides full path
-                            then SourceFilePath := ParamStr(i + 1)
-                            else SourceFilePath := GetCurrentDir + ParamStr(i + 1);  // User provides path in local directory
-                        // {$ENDIF}
-                        // {$IFDEF WINDOWS}
-                        // {$ENDIF}
-                        end;
-            '-ec':      begin
-                        // {$IFDEF LINUX}
-                            If Copy(ParamStr(i + 1), 1, 1) = slash  // Full path
-                            then EditorPath := ParamStr(i + 1)
-                            else EditorPath := GetCurrentDir + ParamStr(i + 1);  // Local path
-                        // {$ENDIF}
-                        end;
-        End;
-    If not FileExists(SourceFilePath) then
-    begin
-        Writeln('Error: No source file found.');
-        Halt(1);
-    end 
-    else if not FileExists(EditorPath) then
-    Begin
-        Writeln('Error: No editor found');
-        Halt(1);
-    End
+    {$IFDEF MSWINDOWS}
+    case (ParamStr(1)) of
+        '-e'    :   begin
+
+                    
+                    end;
+    end;
+    {$ENDIF}
+    // For i := 1 to ParamCount do
+    //     Case ParamStr(i) of
+    //         '-e': SourceFilePath := SourceFilePath + slash + ParamStr(i + 1);
+    //         '-edit':    begin
+    //                     // {$IFDEF LINUX}
+    //                         If Copy(ParamStr(i + 1), 1, 1) = slash then 
+    //                             SourceFilePath := ParamStr(i + 1)
+    //                         else SourceFilePath := GetCurrentDir + ParamStr(i + 1);  // User provides path in local directory
+    //                     // {$ENDIF}
+    //                     // {$IFDEF MSWINDOWS}
+    //                     // {$ENDIF}
+    //                     end;
+    //         '-ec':      begin
+    //                     // {$IFDEF LINUX}
+    //                         If Copy(ParamStr(i + 1), 1, 1) = slash  // Full path
+    //                         then EditorPath := ParamStr(i + 1)
+    //                         else EditorPath := GetCurrentDir + ParamStr(i + 1);  // Local path
+    //                     // {$ENDIF}
+    //                     end;
+    //     End;
+    // If not FileExists(SourceFilePath) then
+    // begin
+    //     Writeln('Error: No source file found.');
+    //     Halt(1);
+    // end 
+    // else if not FileExists(EditorPath) then
+    // Begin
+    //     Writeln('Error: No editor found');
+    //     Halt(1);
+    // End
     else Begin
         fname := Copy(SourceFilePath, 1, Length(SourceFilePath) - 4);
         ExecuteProcess(EditorPath, [SourceFilePath], []);
