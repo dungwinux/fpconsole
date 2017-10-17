@@ -133,7 +133,7 @@ End;
 Procedure EditSource;
 // Open a text editor and edit the source code
 VAR
-    EditorPath: AnsiString = {$IFDEF LINUX} '/bin/nano' {$ENDIF};  // Assuming nano as a default editor
+    EditorPath: AnsiString = ' ' {$IFDEF LINUX} + '/bin/nano' {$ENDIF};  // Assuming nano as a default editor
     SourceFilePath: AnsiString;
     i: Byte;
 Begin
@@ -141,16 +141,20 @@ Begin
     For i := 1 to ParamCount do
         Case ParamStr(i) of
             '-e': SourceFilePath := SourceFilePath + '/' + ParamStr(i + 1);
-            '-edit': {$IFDEF LINUX}
-                     If Copy(ParamStr(i + 1), 1, 1) = '/'  // User provides full path
-                     then SourceFilePath := ParamStr(i + 1)
-                     else SourceFilePath := GetCurrentDir + ParamStr(i + 1);  // User provides path in local directory
-                     {$ENDIF}
-            '-ec': {$IFDEF LINUX}
-                   If Copy(ParamStr(i + 1), 1, 1) = '/'  // Full path
-                   then EditorPath := ParamStr(i + 1)
-                   else EditorPath := GetCurrentDir + ParamStr(i + 1);  // Local path
-                   {$ENDIF}
+            '-edit': begin
+                    {$IFDEF LINUX}
+                        If Copy(ParamStr(i + 1), 1, 1) = '/'  // User provides full path
+                        then SourceFilePath := ParamStr(i + 1)
+                        else SourceFilePath := GetCurrentDir + ParamStr(i + 1);  // User provides path in local directory
+                    {$ENDIF}
+                    end;
+            '-ec':  begin
+                    {$IFDEF LINUX}
+                        If Copy(ParamStr(i + 1), 1, 1) = '/'  // Full path
+                        then EditorPath := ParamStr(i + 1)
+                        else EditorPath := GetCurrentDir + ParamStr(i + 1);  // Local path
+                    {$ENDIF}
+                    end;
         End;
     If not FileExists(SourceFilePath) or not FileExists(EditorPath)
     then Begin
