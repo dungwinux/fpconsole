@@ -75,6 +75,5 @@ i,j,m,n: integer;
 ...
 ```
 
-
 ## License
 [MIT License](/LICENSE) (c) Nguyễn Tuấn Dũng *(@winux8yt3)*
