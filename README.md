@@ -75,7 +75,7 @@ i,j,m,n: integer;
 ...
 ```
 
-## Changelog
+## History
 
 ### Version 1.3
 - Add support for Linux

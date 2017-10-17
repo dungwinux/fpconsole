@@ -7,5 +7,6 @@
 *.o
 *.dat
 *.zip
+fpconsole
 .vscode/
 deploy/
