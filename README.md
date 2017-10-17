@@ -75,24 +75,5 @@ i,j,m,n: integer;
 ...
 ```
 
-## Changelog
-
-### Version 1.3
-- Add support for Linux
-- Fix #5
-
-### Version 1.2.2 *Build 170326*
-- Change Work Folder to %TEMP%.
-- Add Help (`-h`), Clear (`-c`), Read Source (`-fs`).
-
-### Version 1.1 *Build 170228*
-- Automatic Find FPC Directory.
-
-### Version 1.0.1 *Build 170227*
-- Fix Directory.
-
-### Version 1.0 *Build 170226*
-- First Release.
-
 ## License
 [MIT License](/LICENSE) (c) Nguyễn Tuấn Dũng *(@winux8yt3)*
