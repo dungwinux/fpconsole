@@ -75,6 +75,7 @@ i,j,m,n: integer;
 ...
 ```
 
+<<<<<<< HEAD
 ## History
 
 ### Version 1.3
@@ -93,6 +94,8 @@ i,j,m,n: integer;
 
 ### Version 1.0 *Build 170226*
 - First Release.
+=======
+>>>>>>> test-rebase
 
 ## License
 [MIT License](/LICENSE) (c) Nguyễn Tuấn Dũng *(@winux8yt3)*
