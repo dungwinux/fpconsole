@@ -4,21 +4,25 @@
 {$NOTE Thanks for forking our project. Github: https://dungwinux.github.io/fpconsole}
 
 uses Crt, SysUtils, DateUtils;
-var
-TEMPFOLDER, Build, dir, fname: AnsiString;
-m: text;
 
-StartFlag, EndFlag: TDateTime;
-ExecTime: Double;
+const
+slash : char = {$IFDEF MSWINDOWS}'\'{$ENDIF} {$IFDEF LINUX}'/'{$ENDIF};
+
+var
+    TEMPFOLDER, Build, dir, fname: AnsiString;
+    m: text;
+
+    StartFlag, EndFlag: TDateTime;
+    ExecTime: Double;
 
 procedure InitBuild();
 var s: string;
 begin
-s:={$I %DATE%}+'-'+{$I %TIME%};
-while pos('/',s) <> 0 do delete(s,pos('/',s),1);
-while pos(':',s) <> 0 do delete(s,pos(':',s),1);
-delete(s,1,2);delete(s,length(s)-1,2);
-Build:=s;
+    s:={$I %DATE%}+'-'+{$I %TIME%};
+    while pos('/',s) <> 0 do delete(s,pos('/',s),1);
+    while pos(':',s) <> 0 do delete(s,pos(':',s),1);
+    delete(s,1,2);delete(s,length(s)-1,2);
+    Build:=s;
 end;
 
 Procedure Help;
@@ -49,7 +53,7 @@ Begin
     Create := (DirectoryExists(tmp)) or (CreateDir(tmp));
     If Create then 
     Begin
-        fname := tmp + {$IFDEF MSWINDOWS}'\'{$ENDIF} {$IFDEF LINUX}'/'{$ENDIF} + fname;
+        fname := tmp + Slash + fname;
         Assign(m, fname + '.pas');
         Rewrite(m);
     End;
@@ -118,7 +122,7 @@ Begin
                 End
                 else Inc(k);
             End
-            else If StrInList(ParamStr(k), AvailableArgs, Length(AvailableArgs))  // If argument is not a duplicate but is validthen 
+            else If StrInList(ParamStr(k), AvailableArgs, Length(AvailableArgs)) then // If argument is not a duplicate but is valid
             Begin
                 Inc(NScannedArgs);
                 UsedArgs[NScannedArgs] := ParamStr(k);
@@ -143,32 +147,40 @@ End;
 Procedure EditSource;
 // Open a text editor and edit the source code
 VAR
-    EditorPath: AnsiString = '' {$IFDEF LINUX} + '/bin/nano' {$ENDIF};  // Assuming nano as a default editor
+    EditorPath: AnsiString;  // Assuming nano as a default editor
     SourceFilePath: AnsiString;
     i: Byte;
 Begin
+    EditorPath:= {$IFDEF MSWINDOWS} GetEnvironmentVariable('windir') + 'C:\Windows\notepad.exe'{$ENDIF} {$IFDEF LINUX} '/bin/nano' {$ENDIF};
     SourceFilePath := TEMPFOLDER;
     For i := 1 to ParamCount do
         Case ParamStr(i) of
-            '-e': SourceFilePath := SourceFilePath + '/' + ParamStr(i + 1);
+            '-e': SourceFilePath := SourceFilePath + slash + ParamStr(i + 1);
             '-edit':    begin
-                        {$IFDEF LINUX}
-                            If Copy(ParamStr(i + 1), 1, 1) = '/'  // User provides full path
+                        // {$IFDEF LINUX}
+                            If Copy(ParamStr(i + 1), 1, 1) = slash  // User provides full path
                             then SourceFilePath := ParamStr(i + 1)
                             else SourceFilePath := GetCurrentDir + ParamStr(i + 1);  // User provides path in local directory
-                        {$ENDIF}
+                        // {$ENDIF}
+                        // {$IFDEF WINDOWS}
+                        // {$ENDIF}
                         end;
             '-ec':      begin
-                        {$IFDEF LINUX}
-                            If Copy(ParamStr(i + 1), 1, 1) = '/'  // Full path
+                        // {$IFDEF LINUX}
+                            If Copy(ParamStr(i + 1), 1, 1) = slash  // Full path
                             then EditorPath := ParamStr(i + 1)
                             else EditorPath := GetCurrentDir + ParamStr(i + 1);  // Local path
-                        {$ENDIF}
+                        // {$ENDIF}
                         end;
         End;
-    If not FileExists(SourceFilePath) or not FileExists(EditorPath)
-    then Begin
-        Writeln('Error: Path to source file or path to editor that you have specified does not exist');
+    If not FileExists(SourceFilePath) then
+    begin
+        Writeln('Error: No source file found.');
+        Halt(1);
+    end 
+    else if not FileExists(EditorPath) then
+    Begin
+        Writeln('Error: No editor found');
         Halt(1);
     End
     else Begin
@@ -235,7 +247,7 @@ Var
 FileDat: TSearchRec;
 b: Boolean;
 Begin
-    s := s + {$IFDEF MSWINDOWS}'\'{$ENDIF} {$IFDEF LINUX}'/'{$ENDIF};
+    s := s + slash;
     Find := DirectoryExists(s);
     If Find then Begin
         If FindFirst(s + '*', faAnyFile, FileDat) = 0 then
@@ -342,21 +354,21 @@ BEGIN
         else If ParamStr(1) = '-c' then Clear
         else Begin
             If StrInList('-edit', [ParamStr(1), ParamStr(2), ParamStr(3), ParamStr(4), ParamStr(5)], 4) then
-            Begin
-                EditSource;
-                If ParamStr(ParamCount) <> '--no-execute' then Execute(fname, False);
-            End
+                Begin
+                    EditSource;
+                    If ParamStr(ParamCount) <> '--no-execute' then Execute(fname, False);
+                End
             else If StrInList('-e', [ParamStr(1), ParamStr(2), ParamStr(3), ParamStr(4), ParamStr(5)], 4)then
-            Begin
-                EditSource;
-                Execute(fname, False);
-            End else 
-                If Create and (Get or SysFind) then 
+                Begin
+                    EditSource;
+                    Execute(fname, False);
+                End 
+            else If Create and (Get or SysFind) then 
                 Begin
                     ReadDat;
                     Execute(fname, True);
                 End
-                else Writeln('FPC NOT FOUND.');
-            End;
+            else Writeln('FPC NOT FOUND.');
+        End;
 END.
 
