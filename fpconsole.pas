@@ -21,11 +21,12 @@ Begin
     Writeln('INFO: FPConsole is a tool that helps you directly write input and get output with the Free Pascal Compiler');
     Writeln('To make it easy, you can directly throw input as the argument or write it in a file');
     Writeln('Sometimes, when there is an error or an infinite loop and the program exited improperly, you can review the code in %TMP%\FPConsole folder');
+    Writeln('FPConsole''s temporary folder: ', TEMPFOLDER);
     Writeln('All FPConsole Switch:');
-    Writeln('-c    :   Clear temporary folder (' + TEMPFOLDER + ')');
+    Writeln('-c    :   Clear temporary folder (', TEMPFOLDER, ')');
     Writeln('-fs   :   Read the whole file in formatted type (.pas)');
     Writeln('-f    :   Read text file with only Function and Procedure');
-    Writeln('-e    :   Edit a source file in the temporary folder (' + TEMPFOLDER + ')');
+    Writeln('-e    :   Edit a source file in the temporary folder (', TEMPFOLDER, ')');
     Writeln('-edit :   Edit a source file given its path');
     Writeln('--no-execute : No executing the program after editing the source file, can only be used with -edit switch only & must provide as the last argument');
     Writeln('-ec   :   Specify the path of the text editor of your own choice, can only be used with -e and -edit switches only');
@@ -125,12 +126,11 @@ End;
 Procedure EditSource;
 // Open a text editor and edit the source code
 VAR
-    EditorPath: AnsiString = {$IFDEF LINUX} '/bin/nano' {$ENDIF};
+    EditorPath: AnsiString = {$IFDEF LINUX} '/bin/nano' {$ENDIF};  // Assuming nano as a default editor
     SourceFilePath: AnsiString;
     i: Byte;
 Begin
     SourceFilePath := TEMPFOLDER;
-    // {$IFDEF LINUX}
     For i := 1 to ParamCount do
         Case ParamStr(i) of
             '-e': SourceFilePath := SourceFilePath + '/' + ParamStr(i + 1);
@@ -145,9 +145,15 @@ Begin
                    else EditorPath := GetCurrentDir + ParamStr(i + 1);  // Local path
                    {$ENDIF}
         End;
-    // {$ENDIF}
-    fname := Copy(SourceFilePath, 1, Length(SourceFilePath) - 4);
-    ExecuteProcess(EditorPath, [SourceFilePath], []);
+    If not FileExists(SourceFilePath) or not FileExists(EditorPath)
+    then Begin
+         Writeln('Error: Path to source file or path to editor that you have specified does not exist');
+         Halt(1);
+         End
+    else Begin
+         fname := Copy(SourceFilePath, 1, Length(SourceFilePath) - 4);
+         ExecuteProcess(EditorPath, [SourceFilePath], []);
+         End;
 End;
 
 Procedure ReadDat;
