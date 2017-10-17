@@ -1,4 +1,4 @@
-uses crt, SysUtils, DateUtils;
+uses crt, SysUtils, DateUtils, getopts;
 var
     TEMPFOLDER, Build, dir, fname: AnsiString;
     m: text;
@@ -26,7 +26,7 @@ Begin
     Writeln('-fs    :   Read the whole file in formatted type (.pas)');
     Writeln('-f     :   Read text file with only Function and Procedure');
     Writeln('-h     :   Show this help');
-    Writeln('FPConsole is an Open-Source Program. Github: fpconsole');
+    Writeln('FPConsole is an Open-Source Program. Github: dungwinux/fpconsole');
 End;
 
 Function Create: boolean;
