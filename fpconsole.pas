@@ -153,14 +153,6 @@ VAR
 Begin
     EditorPath:= {$IFDEF MSWINDOWS} GetEnvironmentVariable('windir') + '\notepad.exe'{$ENDIF} {$IFDEF LINUX} '/bin/nano' {$ENDIF};
     SourceFilePath := TEMPFOLDER;
-    {$IFDEF MSWINDOWS}
-    case (ParamStr(1)) of
-        '-e'    :   begin
-
-                    
-                    end;
-    end;
-    {$ENDIF}
     // For i := 1 to ParamCount do
     //     Case ParamStr(i) of
     //         '-e': SourceFilePath := SourceFilePath + slash + ParamStr(i + 1);
@@ -178,6 +170,8 @@ Begin
     //                         If Copy(ParamStr(i + 1), 1, 1) = slash  // Full path
     //                         then EditorPath := ParamStr(i + 1)
     //                         else EditorPath := GetCurrentDir + ParamStr(i + 1);  // Local path
+    //                     // {$ENDIF}
+    //                     // {$IFDEF MSWINDOWS}
     //                     // {$ENDIF}
     //                     end;
     //     End;
