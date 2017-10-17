@@ -1,3 +1,8 @@
+{$LONGSTRINGS ON}
+
+{$NOTE [FPConsole]. Created by Nguyen Tuan Dung (@dungwinux) and Nguyen Hoang Duong (@NOVAglow)}
+{$NOTE Thanks for forking our project. Github: https://dungwinux.github.io/fpconsole}
+
 uses Crt, SysUtils, DateUtils;
 var
     TEMPFOLDER, Build, dir, fname: AnsiString;
@@ -23,12 +28,12 @@ Begin
     Writeln('Sometimes, when there is an error or an infinite loop and the program exited improperly, you can review the code in %TMP%\FPConsole folder');
     Writeln('FPConsole''s temporary folder: ', TEMPFOLDER);
     Writeln('All FPConsole Switch:');
-    Writeln('-c    :   Clear temporary folder (', TEMPFOLDER, ')');
+    Writeln('-c    :   Clear temporary folder');
     Writeln('-fs   :   Read the whole file in formatted type (.pas)');
     Writeln('-f    :   Read text file with only Function and Procedure');
-    Writeln('-e    :   Edit a source file in the temporary folder (', TEMPFOLDER, ')');
+    Writeln('-e    :   Edit a source file in the temporary folder');
     Writeln('-edit :   Edit a source file given its path');
-    Writeln('--no-execute : No executing the program after editing the source file, can only be used with -edit switch only & must provide as the last argument');
+    Writeln('    --no-execute : No executing the program after editing the source file, can only be used with -edit switch only & must provide as the last argument');
     Writeln('-ec   :   Specify the path of the text editor of your own choice, can only be used with -e and -edit switches only');
     Writeln('-h    :   Show this help');
     Writeln('FPConsole is an Open-Source Program. Github: fpconsole');
@@ -70,10 +75,11 @@ Function StrInList(s: AnsiString; A: Array of AnsiString; b: Byte): Boolean;
 VAR i: Byte;
 Begin
     StrInList := False;
-    For i := 0 to b do If A[i] = s then Begin
-                                        StrInList := True;
-                                        Break;
-                                        End;
+    For i := 0 to b do If A[i] = s then
+    Begin
+        StrInList := True;
+        Break;
+    End;
 End;
 
 Function FineArgs: Boolean;
@@ -133,7 +139,7 @@ End;
 Procedure EditSource;
 // Open a text editor and edit the source code
 VAR
-    EditorPath: AnsiString = ' ' {$IFDEF LINUX} + '/bin/nano' {$ENDIF};  // Assuming nano as a default editor
+    EditorPath: AnsiString = '' {$IFDEF LINUX} + '/bin/nano' {$ENDIF};  // Assuming nano as a default editor
     SourceFilePath: AnsiString;
     i: Byte;
 Begin
@@ -345,3 +351,4 @@ BEGIN
              else Writeln('FPC NOT FOUND.');
              End;
 END.
+
