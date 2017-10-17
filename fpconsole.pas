@@ -121,6 +121,13 @@ Begin
                        End;
         Inc(k);
         End;
+    // Check if -ec switch is called but neither -e not -edit is
+    If (StrInList('-ec', UsedArgs, Length(UsedArgs)))
+       and ((not StrInList('-e', UsedArgs, Length(UsedArgs))) or (not StrInList('-edit', UsedArgs, Length(UsedArgs))))
+    then Begin
+         FineArgs := False;
+         Writeln('Error: The path to source file is not specified');
+         End;
 End;
 
 Procedure EditSource;
