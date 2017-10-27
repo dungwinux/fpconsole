@@ -85,11 +85,11 @@ Begin
         Write(m, 'uses ');
         Input('unit.dat');  // Get unit
         Writeln(m, 'sysutils, crt;');
-        Writeln(m, #13#10, 'type', #13#10, 'Int = Integer;');
+        Writeln(m, #13#10, 'type', #13#10, '_Int = Integer;');
         Input('type.dat');  // Get type
-        Writeln(m, #13#10, 'const', #13#10, '_Default=', #39, 'FPConsole', #39, ';');
+        Writeln(m, #13#10, 'const', #13#10, '_Def = ', #39, 'FPConsole', #39, ';');
         Input('const.dat'); // Get const
-        Writeln(m, #13#10, 'var', #13#10, '_nuStr:string;', #13#10, '_nInt:integer;', #13#10, '_nReal:real;', #13#10, '_nText:text;');
+        Writeln(m, #13#10, 'var', #13#10, '_boo: Boolean;');
         Input('var.dat');   // Get var
         Writeln(m, #13#10, 'begin');
         Case ParamStr(1) of
