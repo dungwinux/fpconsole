@@ -1,6 +1,7 @@
 uses crt, SysUtils, DateUtils, getopts;
 var
     TEMPFOLDER, Build, dir, fname: AnsiString;
+    Editor: AnsiString;
     m: text;
 
     StartFlag, EndFlag: TDateTime;
@@ -25,6 +26,7 @@ Begin
     Writeln('-c     :   Clear TEMP');
     Writeln('-fs    :   Read the whole file in formatted type (.pas)');
     Writeln('-f     :   Read text file with only Function and Procedure');
+    Writeln('-fe    :   Read the file on-the-fly');
     Writeln('-h     :   Show this help');
     Writeln('FPConsole is an Open-Source Program. Github: dungwinux/fpconsole');
 End;
@@ -60,6 +62,19 @@ Begin
     End;
 End;
 
+procedure OpenEditor;
+begin
+    writeln(m,'// Your code goes here');
+    writeln(m);
+    Write(m, 'end.');
+    close(m);
+    ExecuteProcess(Editor, fname+'.pas', []);
+    append(m);
+    if (FileExists(FName+'.pas')) then
+        Input(FName+'.pas')
+    else writeln('File Lost!');
+end;
+
 Procedure ReadDat;
 VAR 
     i: byte;
@@ -69,7 +84,7 @@ Begin
     else Begin
         Write(m, 'uses ');
         Input('unit.dat');  // Get unit
-        Writeln(m, 'crt;');
+        Writeln(m, 'sysutils, crt;');
         Writeln(m, #13#10, 'type', #13#10, 'Int = Integer;');
         Input('type.dat');  // Get type
         Writeln(m, #13#10, 'const', #13#10, '_Default=', #39, 'FPConsole', #39, ';');
@@ -78,18 +93,14 @@ Begin
         Input('var.dat');   // Get var
         Writeln(m, #13#10, 'begin');
         Case ParamStr(1) of
-            '-f' :  Input(ParamStr(2));
-            // ''   :  Begin 
-            //         Writeln('[INPUT] ( type "//" to stop entering code )');
-            //         Repeat
-            //             Readln(t);
-            //             Writeln(m, t);
-            //         Until t = '//';
-            //         End;
-            ''  :   Help;
+            '-f'    :   begin
+                            Input(ParamStr(2));
+                            Write(m, 'end.');
+                        end;
+            '-fe'   :   OpenEditor;
+            ''      :   Help;
             else For i := 1 to ParamCount do Writeln(m, ParamStr(i));
         End;
-        Write(m, 'end.');
     End;
     Close(m); 
 End;
@@ -153,8 +164,13 @@ Begin
     Writeln('FPC Dir:', dir);
     ReadDat;
     if (ParamStr(1)<>'') then begin
-        {$IFDEF MSWINDOWS}ExecuteProcess(dir, ['-v0', fname], []);{$ENDIF}
-        {$IFDEF LINUX}ExecuteProcess('/bin/bash', ['-c', 'fpc ' + fname + ' &>/dev/null']);{$ENDIF}
+
+        {$IFDEF MSWINDOWS}
+        ExecuteProcess(dir, ['-v0', fname], []);
+        {$ENDIF}
+        {$IFDEF LINUX}
+        ExecuteProcess('/bin/bash', ['-c', 'fpc ' + fname + ' &>/dev/null']);
+        {$ENDIF}
         DeleteFile(fname + '.pas');
 
         Writeln('[OUTPUT]');
@@ -207,8 +223,12 @@ var tmp: AnsiString;
 Begin
     tmp := TEMPFOLDER;
     If DirectoryExists(tmp) then Begin
-        {$IFDEF MSWINDOWS}DeleteDir(tmp);{$ENDIF}
-        {$IFDEF LINUX}ExecuteProcess('/bin/bash', ['-c', 'rm -rf ' + tmp], []);{$ENDIF}
+        {$IFDEF MSWINDOWS}
+        DeleteDir(tmp);
+        {$ENDIF}
+        {$IFDEF LINUX}
+        ExecuteProcess('/bin/bash', ['-c', 'rm -rf ' + tmp], []);
+        {$ENDIF}
         CreateDir(tmp);
     End;
     writeln('TEMP Folder Removed!');
@@ -216,10 +236,24 @@ End;
 
 begin
     Clrscr;InitBuild;
-    TEMPFOLDER := {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF} {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
+    
+    // Init String
+    {$IFDEF MSWINDOWS}
+    Editor := 'notepad';
+    TEMPFOLDER := GetEnvironmentVariable('TEMP') + '\FPConsole';
+    {$ENDIF} 
+    {$IFDEF LINUX}
+    Editor := 'nano';
+    TEMPFOLDER := '/tmp/FPConsole';
+    {$ENDIF}
+
     Writeln('FPConsole ',Build,' - Created by Winux8YT3');
     writeln('TEMP Folder: ', TEMPFOLDER);
     If ParamStr(1) = '-h' then Help
     else if ParamStr(1) = '-c' then Clear
-    else if Create and (Get or SysFind) then Execute else Writeln('FPC NOT FOUND');
+    else if Create then begin
+        if (Get or SysFind) then 
+            Execute
+        else Writeln('FPC NOT FOUND');
+    end else writeln('Can',#39,'t create temp file for compiling.') 
 end.
