@@ -106,7 +106,9 @@ Begin
 End;
 
 Function Get: boolean;
+{$IFDEF MSWINDOWS}
 VAR FileDat: TSearchRec;
+{$ENDIF}
 Begin
     {$IFDEF MSWINDOWS}
     Get := DirectoryExists('C:\FPC\');
@@ -243,7 +245,7 @@ begin
     TEMPFOLDER := GetEnvironmentVariable('TEMP') + '\FPConsole';
     {$ENDIF} 
     {$IFDEF LINUX}
-    Editor := 'nano';
+    Editor := '/bin/nano';
     TEMPFOLDER := '/tmp/FPConsole';
     {$ENDIF}
 
