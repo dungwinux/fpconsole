@@ -4,7 +4,7 @@ var
     Editor: AnsiString;
     m: text;
     argPos: integer = 0;
-    argStr: AnsiString;
+    argStr:Array [0..255] of AnsiString;
 
     StartFlag, EndFlag: TDateTime;
     ExecTime: Double;
@@ -31,9 +31,9 @@ end;
 procedure InitParam;
 var i: integer;
 begin
-    argStr := ParamStr(argPos);
-    for i:=argPos+1 to ParamCount do
-        argStr := argStr + ParamStr(i);
+    argStr[0] := ParamStr(argPos);
+    for i:=1 to ParamCount do
+        argStr[i] := ParamStr(argPos+i);
 end;
 
 procedure InitBuild();
