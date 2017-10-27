@@ -78,7 +78,6 @@ end;
 Procedure ReadDat;
 VAR 
     i: byte;
-    t: string;
 Begin
     If ParamStr(1) = '-fs' then Input(ParamStr(2))
     else Begin
@@ -150,12 +149,14 @@ End;
 
 Function SysFind:boolean;
 VAR s: AnsiString;
+    ch: char = {$IFDEF MSWINDOWS}';'{$ENDIF} {$IFDEF LINUX}':'{$ENDIF};
+    // Seperate path symbol
 Begin
-    s := GetEnvironmentVariable('PATH') + {$IFDEF MSWINDOWS}';'{$ENDIF} {$IFDEF LINUX}':'{$ENDIF};
+    s := GetEnvironmentVariable('PATH') + ;
     Repeat
-        dir := copy(s, 1, pos({$IFDEF MSWINDOWS}';'{$ENDIF} {$IFDEF LINUX}':'{$ENDIF}, s) - 1);
+        dir := copy(s, 1, pos(ch, s) - 1);
         SysFind := Find(dir);
-        delete(s, 1, pos({$IFDEF MSWINDOWS}';'{$ENDIF} {$IFDEF LINUX}':'{$ENDIF}, s)); 
+        delete(s, 1, pos(ch, s)); 
     Until SysFind or (s = '');
     Writeln('Find FPC (Custom):', SysFind);
 End;
