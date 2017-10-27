@@ -3,9 +3,38 @@ var
     TEMPFOLDER, Build, dir, fname: AnsiString;
     Editor: AnsiString;
     m: text;
+    argPos: integer = 0;
+    argStr: AnsiString;
 
     StartFlag, EndFlag: TDateTime;
     ExecTime: Double;
+
+procedure Return(msg: string);
+begin
+    writeln(msg);
+    halt(1);
+end;
+
+procedure Return(code: integer);
+var msg: string = 'Error';
+begin
+    case code of 
+        1   :   msg := 'File Lost!';
+        2   :   msg := 'COMPILE ERROR';
+        3   :   msg := 'FPC NOT FOUND';
+        4   :   msg := 'Can'+#39+'t create temp file for compiling.';
+    end;
+    writeln(msg);
+    halt(code);
+end;
+
+procedure InitParam;
+var i: integer;
+begin
+    argStr := ParamStr(argPos);
+    for i:=argPos+1 to ParamCount do
+        argStr := argStr + ParamStr(i);
+end;
 
 procedure InitBuild();
 var s: string;
@@ -13,7 +42,8 @@ begin
     s:={$I %DATE%}+'-'+{$I %TIME%};
 	while pos('/',s) <> 0 do delete(s,pos('/',s),1);
 	while pos(':',s) <> 0 do delete(s,pos(':',s),1);
-    delete(s,1,2);delete(s,length(s)-1,2);
+    delete(s,1,2);
+    delete(s,length(s)-1,2);
     Build:=s;
 end;
 
@@ -72,34 +102,38 @@ begin
     append(m);
     if (FileExists(FName+'.pas')) then
         Input(FName+'.pas')
-    else writeln('File Lost!');
+    else Return(1);
 end;
 
 Procedure ReadDat;
-VAR 
-    i: byte;
 Begin
-    If ParamStr(1) = '-fs' then Input(ParamStr(2))
+    If ParamStr(1) = '-fs' then begin
+        if FileExists(ParamStr(2)) then
+            Input(ParamStr(2))
+        else begin
+            Return(1);
+        end;
+    end
     else Begin
         Write(m, 'uses ');
-        Input('unit.dat');  // Get unit
+        Input('_unit.dat');  // Get unit
         Writeln(m, 'sysutils, crt;');
         Writeln(m, #13#10, 'type', #13#10, '_Int = Integer;');
-        Input('type.dat');  // Get type
+        Input('_type.dat');  // Get type
         Writeln(m, #13#10, 'const', #13#10, '_Def = ', #39, 'FPConsole', #39, ';');
-        Input('const.dat'); // Get const
+        Input('_const.dat'); // Get const
         Writeln(m, #13#10, 'var', #13#10, '_boo: Boolean;');
-        Input('var.dat');   // Get var
+        Input('_var.dat');   // Get var
         Writeln(m, #13#10, 'begin');
         Case ParamStr(1) of
             '-f'    :   begin
                             Input(ParamStr(2));
-                            Write(m, 'end.');
                         end;
             '-fe'   :   OpenEditor;
             ''      :   Help;
-            else For i := 1 to ParamCount do Writeln(m, ParamStr(i));
+            else Writeln(m, ParamStr(1));
         End;
+        if not (ParamStr(1) = '-fe') then Write(m, 'end.');
     End;
     Close(m); 
 End;
@@ -152,7 +186,7 @@ VAR s: AnsiString;
     ch: char = {$IFDEF MSWINDOWS}';'{$ENDIF} {$IFDEF LINUX}':'{$ENDIF};
     // Seperate path symbol
 Begin
-    s := GetEnvironmentVariable('PATH') + ;
+    s := GetEnvironmentVariable('PATH') + ch;
     Repeat
         dir := copy(s, 1, pos(ch, s) - 1);
         SysFind := Find(dir);
@@ -183,18 +217,18 @@ Begin
             Close(m);
             DeleteFile(fname + '.o');
             StartFlag := Now;
-            exitcode := ExecuteProcess(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF}, '', []);
+            if (not FileExists(fname{$IFDEF MSWINDOWS}+ '.exe'{$ENDIF})) then Return(1);
+            exitcode := ExecuteProcess(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF}, argStr, []);
             EndFlag := Now;
             DeleteFile(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
             // This may affects execute time
-            // ExecTime := SecondsBetween(StartFlag, EndFlag);
             ExecTime := SecondSpan(StartFlag, EndFlag);
             writeln;
             writeln('--------------------');
             writeln('Execution Time: ', ExecTime:0:16, ' s');
             writeln('Process Exited with Exit code ', exitcode);
         End
-        else Writeln('COMPILE ERROR');
+        else Return(2);
     end;
 End;
 
@@ -234,7 +268,7 @@ Begin
         {$ENDIF}
         CreateDir(tmp);
     End;
-    writeln('TEMP Folder Removed!');
+    writeln('TEMP Folder Cleared!');
 End;
 
 begin
@@ -255,8 +289,12 @@ begin
     If ParamStr(1) = '-h' then Help
     else if ParamStr(1) = '-c' then Clear
     else if Create then begin
-        if (Get or SysFind) then 
-            Execute
-        else Writeln('FPC NOT FOUND');
-    end else writeln('Can',#39,'t create temp file for compiling.') 
+        if (Get or SysFind) then begin
+            argPos := 2;
+            if (ParamStr(1) = '-f') or (ParamStr(1) = '-fs') then argPos := 3;
+            InitParam;
+            Execute;
+        end
+        else Writeln(3);
+    end else writeln(4) 
 end.
