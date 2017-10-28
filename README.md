@@ -10,24 +10,22 @@ This debug tool helps you directly write input and get output in Free Pascal Com
 > These instructions are available in latest version ( **v1.5** ). For old version, checkout wiki page for proper parameter.
 
 ### Simple Execute
-> `fpconsole [command]`
+`fpconsole [command]`
 
-- Command Prompt
+- Command Prompt : `fpconsole [command]`
 ```batch
 C:\> fpconsole "write('Hello World!');"
 ```
 ![Command Prompt Example](/img/fpconsole_cmd.gif)
 
-- Powershell 
-> `.\fpconsole [command]`
+- Powershell : `.\fpconsole [command]`
 
 ```powershell
 PS C:\> .\fpconsole "write('Hello World!');"
 ```
 ![Powershell Example](/img/fpconsole_powershell.gif)
 
-- Bash
-> `./fpconsole [command]`
+- Bash : `./fpconsole [command]`
 
 ```bash
 $ ./fpconsole "write('Hello World!');"
@@ -38,36 +36,36 @@ $ ./fpconsole "write('Hello World!');"
 
 - Execute With Custom Parameter
 
-> `fpconsole [Code] [Parameter]`
-
-- Edit Source File Before Compiling
-
-> `fpconsole -fe [Parameter]`
+`fpconsole [Code] [Parameter]`
 
 - Get Code From a Text File
 
-> `fpconsole -f [File Include Code] [Parameter]`
+`fpconsole -f [File Include Code] [Parameter]`
+
+- Edit Source File Before Compiling
+
+`fpconsole -fe [Parameter]`
 
 - ...or Get The Whole Source Code
 
-> `fpconsole -fs [Source Code File] [Parameter]`
+`fpconsole -fs [Source Code File] [Parameter]`
 
 Example
 ```powershell
-PS C:\> .\fpconsole "write('Hello World')" "asd" "haeads"
-# This will execute with parameter "asd" and "haeads"
-
-PS C:\> .\fpconsole -fe
-# This will open notepad/nano to edit
+PS C:\> .\fpconsole "write('Hello World')" "-e" "Hello"
+# This will execute with parameter "-e" and "Hello"
 
 PS C:\> .\fpconsole -f "Code.dat"
 # This will read main program from "Code.dat"
+
+PS C:\> .\fpconsole -fe
+# This will open notepad/nano to edit
 
 PS C:\> .\fpconsole -fs "Code.pas"
 # This will copy "Code.pas" then compile
 ```
 
-### _(Optional)_ 
+### _(Optional Files)_ 
 - Add UNIT to _**_unit.dat**_
 ```pascal
 sysutils,
@@ -103,12 +101,11 @@ i,j,m,n: integer;
 - Change Input Folder:
 
 |Old File Name|New File Name|
-|---|---|
-|unit.dat|_unit.dat|
-|var.dat|_var.dat|
-|const.dat|_const.dat|
-|type.dat|_type.dat|
-
+|:------------|:------------|
+|unit.dat     |_unit.dat    |
+|var.dat      |_var.dat     |
+|const.dat    |_const.dat   |
+|type.dat     |_type.dat    |
 
 ### Version 1.3
 - Add support for Linux
