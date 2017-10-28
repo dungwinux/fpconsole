@@ -54,14 +54,13 @@ end;
 
 Procedure Help;
 Begin
-    Writeln('INFO: FPConsole is a tool that helps you directly write input and get output with the Free Pascal Compiler');
-    Writeln('To make it easy, you can directly throw input as the argument or write it in a file');
-    Writeln('Sometimes, when there is an error or an infinite loop and the program exited improperly, you can review the code in %TMP%\FPConsole folder');
+    Writeln('INFO: FPConsole is a tool that helps you directly write code and get output with the Free Pascal Compiler');
+    Writeln('Attention: Sometimes, when there is an infinite loop and the program exited improperly, you can review the code in TEMP\FPConsole folder');
     Writeln('All FPConsole Switch:');
     Writeln('-c     :   Clear TEMP');
-    Writeln('-fs    :   Read the whole file in formatted type (.pas)');
     Writeln('-f     :   Read text file with only Function and Procedure');
     Writeln('-fe    :   Read the file on-the-fly');
+    Writeln('-fs    :   Read the whole file in formatted type (.pas)');
     Writeln('[blank]:   Show this help');
     Writeln('FPConsole is an Open-Source Program. Github: dungwinux/fpconsole');
 End;
