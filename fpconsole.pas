@@ -1,6 +1,6 @@
 {$CODEPAGE UTF8}
 // For font compatibility
-// Remove this if string showing incorrectly
+// Remove this if string showing incorrectly or you want to use your system codepage
 
 uses crt, SysUtils, DateUtils, getopts;
 var
@@ -23,6 +23,7 @@ procedure Return(code: integer);
 var msg: string = 'Error';
 begin
     case code of 
+        0   :   msg := '';
         1   :   msg := 'File Lost!';
         2   :   msg := 'COMPILE ERROR';
         3   :   msg := 'FPC NOT FOUND';
@@ -61,7 +62,7 @@ Begin
     Writeln('-fs    :   Read the whole file in formatted type (.pas)');
     Writeln('-f     :   Read text file with only Function and Procedure');
     Writeln('-fe    :   Read the file on-the-fly');
-    Writeln('-h     :   Show this help');
+    Writeln('[blank]:   Show this help');
     Writeln('FPConsole is an Open-Source Program. Github: dungwinux/fpconsole');
 End;
 
@@ -276,7 +277,8 @@ Begin
 End;
 
 begin
-    Clrscr;InitBuild;
+    ClrScr;
+    InitBuild;
     
     // Init String
     {$IFDEF MSWINDOWS}
@@ -290,8 +292,11 @@ begin
 
     Writeln('FPConsole ',Build,' - Created by Winux8YT3');
     writeln('TEMP Folder: ', TEMPFOLDER);
-    If ParamStr(1) = '-h' then Help
-    else if ParamStr(1) = '-c' then Clear
+    If ParamCount = 0 then begin
+        Help;
+        Return(0);
+    end;
+    If ParamStr(1) = '-c' then Clear
     else if Create then begin
         if (Get or SysFind) then begin
             argPos := 2;
@@ -300,5 +305,5 @@ begin
             Execute;
         end
         else Writeln(3);
-    end else writeln(4) 
+    end else writeln(4);
 end.
