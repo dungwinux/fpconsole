@@ -1,3 +1,7 @@
+{$CODEPAGE UTF8}
+// For font compatibility
+// Remove this if string showing incorrectly
+
 uses crt, SysUtils, DateUtils, getopts;
 var
     TEMPFOLDER, Build, dir, fname: AnsiString;
