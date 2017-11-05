@@ -131,7 +131,11 @@ Begin
         Writeln(m, #13#10, 'begin');
         Case ParamStr(1) of
             '-f'    :   begin
-                            Input(ParamStr(2));
+                            if FileExists(ParamStr(2)) then
+                                Input(ParamStr(2))
+                            else begin
+                                Return(1);
+                            end;    
                         end;
             '-fe'   :   OpenEditor;
             ''      :   Help;
