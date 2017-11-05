@@ -98,9 +98,10 @@ i,j,m,n: integer;
 ## Changelog
 
 ### Version 1.5
-- Open defualt editor to edit source before compiling (#13)
+- Open defualt editor to edit source before compiling (`-fe`) (#13)
 - Add execution time (#11)
-- Add Custom Parameter for running codes
+- Code now can execute with custom parameters
+- Add color
 - Change Input Folder:
 
 |Old File Name|New File Name|
