@@ -1,4 +1,4 @@
-![FPConsole](docs\images\terminal-icon.png) FPConsole
+![FPConsole](docs/images/terminal-icon.png) FPConsole
 ==============================
 
 [![Download FPConsole](https://img.shields.io/sourceforge/dw/fpconsole.svg)](https://sourceforge.net/projects/fpconsole/files/latest/download)
