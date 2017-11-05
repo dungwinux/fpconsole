@@ -20,14 +20,14 @@ begin
 end;
 
 procedure Return(code: integer);
-var msg: string = 'Error';
+var msg: string = '[ERROR]';
 begin
     case code of 
         0   :   msg := '';
-        1   :   msg := 'File Lost!';
-        2   :   msg := 'COMPILE ERROR';
-        3   :   msg := 'FPC NOT FOUND';
-        4   :   msg := 'Can'+#39+'t create temp file for compiling.';
+        1   :   msg := msg + ' File Does Not Exist!';
+        2   :   msg := msg + ' COMPILE ERROR';
+        3   :   msg := msg + ' FPC NOT FOUND';
+        4   :   msg := msg + ' Can'+#39+'t create temp file for compiling.';
     end;
     writeln(msg);
     halt(code);
