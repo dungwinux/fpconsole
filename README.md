@@ -4,71 +4,88 @@ FPConsole
 ## Debug tool for Pascal Developer
 This debug tool helps you directly write input and get output in Free Pascal Compiler without writing a new file.
 
-**Note**: FPConsole requires _Free Pascal_ installed on the system. [Download here](http://www.freepascal.org/download.var)
+**Note**: FPConsole requires _Free Pascal Compiler_ installed on the system. [Download here](http://www.freepascal.org/download.var)
 
-### Instructions:
+## Instructions:
+> These instructions are available in latest version ( **v1.5** ). For old version, checkout wiki page for proper parameter.
 
-- For Windows Command Prompt
-> `fpconsole [command]`
+### Simple Execute
+`fpconsole [command]`
 
-Example
+- Command Prompt : `fpconsole [command]`
 ```batch
-C:\> fpconsole "write('Hello World!');"
+C:\> fpconsole "write('Hello World');"
 ```
-![Ex-Cmd](/img/fpconsole_cmd.gif)
+![Command Prompt Example](/img/fpcs_cmd.gif)
 
-- For Windows Powershell 
-> `.\fpconsole [command]`
+- Powershell : `.\fpconsole [command]`
 
-Example
 ```powershell
-PS C:\> .\fpconsole "write('Hello World!');"
+PS C:\> .\fpconsole "write('Hello World');"
 ```
-![Ex-Powershell](/img/fpconsole_powershell.gif)
+![Powershell Example](/img/fpcs_ps.gif)
 
-- For Linux terminal
-> `./fpconsole [command]`
+- Linux Terminal : `./fpconsole [command]`
 
-Example
 ```bash
-$ ./fpconsole -fs HelloWorld.pas
+$ ./fpconsole "write('Hello World');"
 ```
-![Ex-Terminal](/img/fpconsole_linux-terminal.gif)
+![Linux Example](/img/fpcs_linux.gif)
+
+### Advanced Execute
+
+- Execute With Custom Parameter
+
+`fpconsole [Code] [Parameter]`
 
 - Get Code From a Text File
 
-> `.\FPConsole -f [File Include Code]`
+`fpconsole -f [File Include Code] [Parameter]`
 
-- ...or Get The Whole Source Code (FPConsole 1.2+)
+- Edit Source File Before Compiling
 
-> `.\FPConsole -fs [Source Code File]`
+`fpconsole -fe [Parameter]`
+
+- ...or Get The Whole Source Code
+
+`fpconsole -fs [Source Code File] [Parameter]`
 
 Example
 ```powershell
+PS C:\> .\fpconsole "write('Hello World')" "-e" "Hello"
+# This will execute with parameter "-e" and "Hello"
+
 PS C:\> .\fpconsole -f "Code.dat"
+# This will read main program from "Code.dat"
+
+PS C:\> .\fpconsole -fe
+# This will open notepad/nano to edit
 
 PS C:\> .\fpconsole -fs "Code.pas"
+# This will copy "Code.pas" then compile
 ```
 
-- _(Optional)_ Add UNIT to _**unit.dat**_
+### _(Optional Files)_ 
+- Add UNIT to _**_unit.dat**_
 ```pascal
 sysutils,
 graph,
 ...
 ```
-- _(Optional)_ Add TYPE to _**type.dat**_
+
+- Add TYPE to _**_type.dat**_
 ```pascal
 Int = -128..128;
 a = array[1..100] of integer;
 ...
 ```
-- _(Optional)_ Add CONST to _**const.dat**_
+- Add CONST to _**_const.dat**_
 ```pascal
 s = 'Hello';
 pi = 3.14;
 ...
 ```
-- _(Optional)_ Add VAR to _**var.dat**_
+- Add VAR to _**_var.dat**_
 ```pascal
 s: string;
 i,j,m,n: integer;
@@ -76,6 +93,19 @@ i,j,m,n: integer;
 ```
 
 ## Changelog
+
+### Version 1.5
+- Open defualt editor to edit source before compiling (#13)
+- Add execution time (#11)
+- Add Custom Parameter for running codes
+- Change Input Folder:
+
+|Old File Name|New File Name|
+|:------------|:------------|
+|unit.dat     |_unit.dat    |
+|var.dat      |_var.dat     |
+|const.dat    |_const.dat   |
+|type.dat     |_type.dat    |
 
 ### Version 1.3
 - Add support for Linux
