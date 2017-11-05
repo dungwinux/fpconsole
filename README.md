@@ -1,8 +1,8 @@
 ![FPConsole](docs/images/terminal-icon.png) FPConsole
 ==============================
 
-[![Download FPConsole](https://img.shields.io/sourceforge/dw/fpconsole.svg)](https://sourceforge.net/projects/fpconsole/files/latest/download)
-[![Download FPConsole](https://img.shields.io/sourceforge/dt/fpconsole.svg)](https://sourceforge.net/projects/fpconsole/files/latest/download)
+[![Download FPConsole](https://img.shields.io/sourceforge/dw/fpconsole.svg?style=flat-square)](https://sourceforge.net/projects/fpconsole/files/latest/download)
+[![Download FPConsole](https://img.shields.io/sourceforge/dt/fpconsole.svg?style=flat-square)](https://sourceforge.net/projects/fpconsole/files/latest/download)
 
 ## Debug tool for Pascal Developer
 This debug tool helps you directly write input and get output in Free Pascal Compiler without writing a new file.
