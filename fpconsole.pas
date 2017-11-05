@@ -22,6 +22,7 @@ end;
 procedure Return(code: integer);
 var msg: string = '[ERROR]';
 begin
+    if code <> 0 then TextColor(Red);
     case code of 
         0   :   msg := '';
         1   :   msg := msg + ' File Does Not Exist!';
@@ -30,6 +31,7 @@ begin
         4   :   msg := msg + ' Can'+#39+'t create temp file for compiling.';
     end;
     writeln(msg);
+    TextColor(White);
     halt(code);
 end;
 
@@ -54,6 +56,7 @@ end;
 
 Procedure Help;
 Begin
+    TextColor(White);
     Writeln('[INFO]: FPConsole is a tool that helps you directly write code and get output with the Free Pascal Compiler');
     Writeln('Attention: Sometimes, when there is an infinite loop and the program exited improperly, you can review the code in TEMP\FPConsole folder');
     Writeln('===== All FPConsole Switches =====');
@@ -232,8 +235,11 @@ Begin
             // This may affects execute time
             ExecTime := SecondSpan(StartFlag, EndFlag);
             writeln;
+            TextColor(White);
             writeln('--------------------');
             writeln('Execution Time: ', ExecTime:0:16, ' s');
+            TextColor(LightGreen);
+            if exitcode <> 0 then TextColor(Red);
             writeln('Process Exited with Exit code ', exitcode);
         End
         else Return(2);
