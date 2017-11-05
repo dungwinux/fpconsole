@@ -55,8 +55,8 @@ end;
 Procedure Help;
 Begin
     Writeln('[INFO]: FPConsole is a tool that helps you directly write code and get output with the Free Pascal Compiler');
-    Writeln('!Attention!: Sometimes, when there is an infinite loop and the program exited improperly, you can review the code in TEMP\FPConsole folder');
-    Writeln('===== All FPConsole Switch =====');
+    Writeln('Attention: Sometimes, when there is an infinite loop and the program exited improperly, you can review the code in TEMP\FPConsole folder');
+    Writeln('===== All FPConsole Switches =====');
     Writeln('-c     :   Clear TEMP');
     Writeln('-f     :   Read text file with only Function and Procedure');
     Writeln('-fe    :   Read the file on-the-fly');
