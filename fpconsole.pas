@@ -280,7 +280,7 @@ Begin
 End;
 
 begin
-    ClrScr;
+    // ClrScr;
     InitBuild;
     
     // Init String
