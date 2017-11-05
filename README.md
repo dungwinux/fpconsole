@@ -25,12 +25,12 @@ PS C:\> .\fpconsole "write('Hello World');"
 ```
 ![Powershell Example](/img/fpcs_ps.gif)
 
-- Bash : `./fpconsole [command]`
+- Linux Terminal : `./fpconsole [command]`
 
 ```bash
 $ ./fpconsole "write('Hello World');"
 ```
-![Bash Example](/img/fpcs_bash.gif)
+![Linux Example](/img/fpcs_linux.gif)
 
 ### Advanced Execute
 
