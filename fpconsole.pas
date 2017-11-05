@@ -1,10 +1,47 @@
-uses crt, SysUtils, DateUtils;
+{$CODEPAGE UTF8}
+// For font compatibility
+// Remove this if string showing incorrectly or you want to use your system codepage
+
+uses crt, SysUtils, DateUtils, getopts;
 var
     TEMPFOLDER, Build, dir, fname: AnsiString;
+    Editor: AnsiString;
     m: text;
+    argPos: integer = 0;
+    argStr:Array [0..255] of AnsiString;
 
     StartFlag, EndFlag: TDateTime;
     ExecTime: Double;
+
+procedure Return(msg: string);
+begin
+    writeln(msg);
+    halt(1);
+end;
+
+procedure Return(code: integer);
+var msg: string = '[ERROR]';
+begin
+    if code <> 0 then TextColor(Red);
+    case code of 
+        0   :   msg := '';
+        1   :   msg := msg + ' File Does Not Exist!';
+        2   :   msg := msg + ' COMPILE ERROR';
+        3   :   msg := msg + ' FPC NOT FOUND';
+        4   :   msg := msg + ' Can'+#39+'t create temp file for compiling.';
+    end;
+    writeln(msg);
+    TextColor(White);
+    halt(code);
+end;
+
+procedure InitParam;
+var i: integer;
+begin
+    argStr[0] := ParamStr(argPos);
+    for i:=1 to ParamCount do
+        argStr[i] := ParamStr(argPos+i);
+end;
 
 procedure InitBuild();
 var s: string;
@@ -12,21 +49,23 @@ begin
     s:={$I %DATE%}+'-'+{$I %TIME%};
 	while pos('/',s) <> 0 do delete(s,pos('/',s),1);
 	while pos(':',s) <> 0 do delete(s,pos(':',s),1);
-    delete(s,1,2);delete(s,length(s)-1,2);
+    delete(s,1,2);
+    delete(s,length(s)-1,2);
     Build:=s;
 end;
 
 Procedure Help;
 Begin
-    Writeln('INFO: FPConsole is a tool that helps you directly write input and get output with the Free Pascal Compiler');
-    Writeln('To make it easy, you can directly throw input as the argument or write it in a file');
-    Writeln('Sometimes, when there is an error or an infinite loop and the program exited improperly, you can review the code in %TMP%\FPConsole folder');
-    Writeln('All FPConsole Switch:');
+    TextColor(White);
+    Writeln('[INFO]: FPConsole is a tool that helps you directly write code and get output with the Free Pascal Compiler');
+    Writeln('Attention: Sometimes, when there is an infinite loop and the program exited improperly, you can review the code in TEMP\FPConsole folder');
+    Writeln('===== All FPConsole Switches =====');
     Writeln('-c     :   Clear TEMP');
-    Writeln('-fs    :   Read the whole file in formatted type (.pas)');
     Writeln('-f     :   Read text file with only Function and Procedure');
-    Writeln('-h     :   Show this help');
-    Writeln('FPConsole is an Open-Source Program. Github: fpconsole');
+    Writeln('-fe    :   Read the file on-the-fly');
+    Writeln('-fs    :   Read the whole file in formatted type (.pas)');
+    Writeln('[blank]:   Show this help');
+    Writeln('FPConsole is an Open-Source Program. Github: dungwinux/fpconsole');
 End;
 
 Function Create: boolean;
@@ -60,42 +99,60 @@ Begin
     End;
 End;
 
+procedure OpenEditor;
+begin
+    writeln(m,'// Your code goes here');
+    writeln(m);
+    Write(m, 'end.');
+    close(m);
+    ExecuteProcess(Editor, fname+'.pas', []);
+    append(m);
+    if (FileExists(FName+'.pas')) then
+        Input(FName+'.pas')
+    else Return(1);
+end;
+
 Procedure ReadDat;
-VAR 
-    i: byte;
-    t: string;
 Begin
-    If ParamStr(1) = '-fs' then Input(ParamStr(2))
+    If ParamStr(1) = '-fs' then begin
+        if FileExists(ParamStr(2)) then
+            Input(ParamStr(2))
+        else begin
+            Return(1);
+        end;
+    end
     else Begin
         Write(m, 'uses ');
-        Input('unit.dat');  // Get unit
-        Writeln(m, 'crt;');
-        Writeln(m, #13#10, 'type', #13#10, 'Int = Integer;');
-        Input('type.dat');  // Get type
-        Writeln(m, #13#10, 'const', #13#10, '_Default=', #39, 'FPConsole', #39, ';');
-        Input('const.dat'); // Get const
-        Writeln(m, #13#10, 'var', #13#10, '_nuStr:string;', #13#10, '_nInt:integer;', #13#10, '_nReal:real;', #13#10, '_nText:text;');
-        Input('var.dat');   // Get var
+        Input('_unit.dat');  // Get unit
+        Writeln(m, 'sysutils, crt;');
+        Writeln(m, #13#10, 'type', #13#10, '_Int = Integer;');
+        Input('_type.dat');  // Get type
+        Writeln(m, #13#10, 'const', #13#10, '_Def = ', #39, 'FPConsole', #39, ';');
+        Input('_const.dat'); // Get const
+        Writeln(m, #13#10, 'var', #13#10, '_boo: Boolean;');
+        Input('_var.dat');   // Get var
         Writeln(m, #13#10, 'begin');
         Case ParamStr(1) of
-            '-f' :  Input(ParamStr(2));
-            // ''   :  Begin 
-            //         Writeln('[INPUT] ( type "//" to stop entering code )');
-            //         Repeat
-            //             Readln(t);
-            //             Writeln(m, t);
-            //         Until t = '//';
-            //         End;
-            ''  :   Help;
-            else For i := 1 to ParamCount do Writeln(m, ParamStr(i));
+            '-f'    :   begin
+                            if FileExists(ParamStr(2)) then
+                                Input(ParamStr(2))
+                            else begin
+                                Return(1);
+                            end;    
+                        end;
+            '-fe'   :   OpenEditor;
+            ''      :   Help;
+            else Writeln(m, ParamStr(1));
         End;
-        Write(m, 'end.');
+        if not (ParamStr(1) = '-fe') then Write(m, 'end.');
     End;
     Close(m); 
 End;
 
 Function Get: boolean;
+{$IFDEF MSWINDOWS}
 VAR FileDat: TSearchRec;
+{$ENDIF}
 Begin
     {$IFDEF MSWINDOWS}
     Get := DirectoryExists('C:\FPC\');
@@ -137,12 +194,14 @@ End;
 
 Function SysFind:boolean;
 VAR s: AnsiString;
+    ch: char = {$IFDEF MSWINDOWS}';'{$ENDIF} {$IFDEF LINUX}':'{$ENDIF};
+    // Seperate path symbol
 Begin
-    s := GetEnvironmentVariable('PATH') + {$IFDEF MSWINDOWS}';'{$ENDIF} {$IFDEF LINUX}':'{$ENDIF};
+    s := GetEnvironmentVariable('PATH') + ch;
     Repeat
-        dir := copy(s, 1, pos({$IFDEF MSWINDOWS}';'{$ENDIF} {$IFDEF LINUX}':'{$ENDIF}, s) - 1);
+        dir := copy(s, 1, pos(ch, s) - 1);
         SysFind := Find(dir);
-        delete(s, 1, pos({$IFDEF MSWINDOWS}';'{$ENDIF} {$IFDEF LINUX}':'{$ENDIF}, s)); 
+        delete(s, 1, pos(ch, s)); 
     Until SysFind or (s = '');
     Writeln('Find FPC (Custom):', SysFind);
 End;
@@ -153,8 +212,13 @@ Begin
     Writeln('FPC Dir:', dir);
     ReadDat;
     if (ParamStr(1)<>'') then begin
-        {$IFDEF MSWINDOWS}ExecuteProcess(dir, ['-v0', fname], []);{$ENDIF}
-        {$IFDEF LINUX}ExecuteProcess('/bin/bash', ['-c', 'fpc ' + fname + ' &>/dev/null']);{$ENDIF}
+
+        {$IFDEF MSWINDOWS}
+        ExecuteProcess(dir, ['-v0', fname], []);
+        {$ENDIF}
+        {$IFDEF LINUX}
+        ExecuteProcess('/bin/bash', ['-c', 'fpc ' + fname + ' &>/dev/null']);
+        {$ENDIF}
         DeleteFile(fname + '.pas');
 
         Writeln('[OUTPUT]');
@@ -164,18 +228,21 @@ Begin
             Close(m);
             DeleteFile(fname + '.o');
             StartFlag := Now;
-            exitcode := ExecuteProcess(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF}, '', []);
+            if (not FileExists(fname{$IFDEF MSWINDOWS}+ '.exe'{$ENDIF})) then Return(1);
+            exitcode := ExecuteProcess(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF}, argStr, []);
             EndFlag := Now;
             DeleteFile(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
             // This may affects execute time
-            // ExecTime := SecondsBetween(StartFlag, EndFlag);
             ExecTime := SecondSpan(StartFlag, EndFlag);
             writeln;
+            TextColor(White);
             writeln('--------------------');
             writeln('Execution Time: ', ExecTime:0:16, ' s');
+            TextColor(LightGreen);
+            if exitcode <> 0 then TextColor(Red);
             writeln('Process Exited with Exit code ', exitcode);
         End
-        else Writeln('COMPILE ERROR');
+        else Return(2);
     end;
 End;
 
@@ -207,19 +274,45 @@ var tmp: AnsiString;
 Begin
     tmp := TEMPFOLDER;
     If DirectoryExists(tmp) then Begin
-        {$IFDEF MSWINDOWS}DeleteDir(tmp);{$ENDIF}
-        {$IFDEF LINUX}ExecuteProcess('/bin/bash', ['-c', 'rm -rf ' + tmp], []);{$ENDIF}
+        {$IFDEF MSWINDOWS}
+        DeleteDir(tmp);
+        {$ENDIF}
+        {$IFDEF LINUX}
+        ExecuteProcess('/bin/bash', ['-c', 'rm -rf ' + tmp], []);
+        {$ENDIF}
         CreateDir(tmp);
     End;
-    writeln('TEMP Folder Removed!');
+    writeln('TEMP Folder Cleared!');
 End;
 
 begin
-    Clrscr;InitBuild;
-    TEMPFOLDER := {$IFDEF MSWINDOWS}GetEnvironmentVariable('TEMP') + '\FPConsole'{$ENDIF} {$IFDEF LINUX}'/tmp/FPConsole'{$ENDIF};
+    // ClrScr;
+    InitBuild;
+    
+    // Init String
+    {$IFDEF MSWINDOWS}
+    Editor := 'notepad';
+    TEMPFOLDER := GetEnvironmentVariable('TEMP') + '\FPConsole';
+    {$ENDIF} 
+    {$IFDEF LINUX}
+    Editor := '/bin/nano';
+    TEMPFOLDER := '/tmp/FPConsole';
+    {$ENDIF}
+
     Writeln('FPConsole ',Build,' - Created by Winux8YT3');
     writeln('TEMP Folder: ', TEMPFOLDER);
-    If ParamStr(1) = '-h' then Help
-    else if ParamStr(1) = '-c' then Clear
-    else if Create and (Get or SysFind) then Execute else Writeln('FPC NOT FOUND');
+    If ParamCount = 0 then begin
+        Help;
+        Return(0);
+    end;
+    If ParamStr(1) = '-c' then Clear
+    else if Create then begin
+        if (Get or SysFind) then begin
+            argPos := 2;
+            if (ParamStr(1) = '-f') or (ParamStr(1) = '-fs') then argPos := 3;
+            InitParam;
+            Execute;
+        end
+        else Writeln(3);
+    end else writeln(4);
 end.
