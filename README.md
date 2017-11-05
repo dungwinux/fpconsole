@@ -14,23 +14,23 @@ This debug tool helps you directly write input and get output in Free Pascal Com
 
 - Command Prompt : `fpconsole [command]`
 ```batch
-C:\> fpconsole "write('Hello World!');"
+C:\> fpconsole "write('Hello World');"
 ```
-![Command Prompt Example](/img/fpconsole_cmd.gif)
+![Command Prompt Example](/img/fpcs_cmd.gif)
 
 - Powershell : `.\fpconsole [command]`
 
 ```powershell
-PS C:\> .\fpconsole "write('Hello World!');"
+PS C:\> .\fpconsole "write('Hello World');"
 ```
-![Powershell Example](/img/fpconsole_powershell.gif)
+![Powershell Example](/img/fpcs_ps.gif)
 
 - Bash : `./fpconsole [command]`
 
 ```bash
-$ ./fpconsole "write('Hello World!');"
+$ ./fpconsole "write('Hello World');"
 ```
-![Bash Example](/img/fpconsole_linux-terminal.gif)
+![Bash Example](/img/fpcs_bash.gif)
 
 ### Advanced Execute
 
