@@ -95,6 +95,11 @@ i,j,m,n: integer;
 ...
 ```
 
+## Project's Website
+- https://github.com/dungwinux/fpconsole
+- https://dungwinux.github.io/fpconsole
+- https://sourceforge.net/projects/fpconsole
+
 ## Changelog
 
 ### Version 1.5
