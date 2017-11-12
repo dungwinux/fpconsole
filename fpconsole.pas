@@ -203,10 +203,15 @@ Begin
         SysFind := Find(dir);
         delete(s, 1, pos(ch, s)); 
     Until SysFind or (s = '');
-    if SysFind then dir := dir + '\fpc';
-    {$IFDEF MSWINDOWS}
-    dir := dir + '.exe';
-    {$ENDIF}
+    if SysFind then begin
+        {$IFDEF MSWINDOWS}
+            dir := dir + '\fpc.exe';
+        {$ENDIF}
+        {$IFDEF LINUX}
+            dir := dir + '/fpc';
+        {$ENDIF}
+    end;
+    
     Writeln('Find FPC (Custom):', SysFind);
 End;
 
