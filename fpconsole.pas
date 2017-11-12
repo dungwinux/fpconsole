@@ -311,7 +311,7 @@ begin
     end;
     If ParamStr(1) = '-c' then Clear
     else if Create then begin
-        if (Get) then begin
+        if (Get or SysFind) then begin
             argPos := 2;
             if (ParamStr(1) = '-f') or (ParamStr(1) = '-fs') then argPos := 3;
             InitParam;
