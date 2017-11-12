@@ -203,6 +203,10 @@ Begin
         SysFind := Find(dir);
         delete(s, 1, pos(ch, s)); 
     Until SysFind or (s = '');
+    if SysFind then dir := dir + '\fpc';
+    {$IFDEF MSWINDOWS}
+    dir := dir + '.exe';
+    {$ENDIF}
     Writeln('Find FPC (Custom):', SysFind);
 End;
 
@@ -275,10 +279,10 @@ Begin
     tmp := TEMPFOLDER;
     If DirectoryExists(tmp) then Begin
         {$IFDEF MSWINDOWS}
-        DeleteDir(tmp);
+            DeleteDir(tmp);
         {$ENDIF}
         {$IFDEF LINUX}
-        ExecuteProcess('/bin/bash', ['-c', 'rm -rf ' + tmp], []);
+            ExecuteProcess('/bin/bash', ['-c', 'rm -rf ' + tmp], []);
         {$ENDIF}
         CreateDir(tmp);
     End;
@@ -307,7 +311,7 @@ begin
     end;
     If ParamStr(1) = '-c' then Clear
     else if Create then begin
-        if (Get or SysFind) then begin
+        if (Get) then begin
             argPos := 2;
             if (ParamStr(1) = '-f') or (ParamStr(1) = '-fs') then argPos := 3;
             InitParam;
