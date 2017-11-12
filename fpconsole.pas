@@ -203,6 +203,15 @@ Begin
         SysFind := Find(dir);
         delete(s, 1, pos(ch, s)); 
     Until SysFind or (s = '');
+    if SysFind then begin
+        {$IFDEF MSWINDOWS}
+            dir := dir + '\fpc.exe';
+        {$ENDIF}
+        {$IFDEF LINUX}
+            dir := dir + '/fpc';
+        {$ENDIF}
+    end;
+    
     Writeln('Find FPC (Custom):', SysFind);
 End;
 
@@ -234,9 +243,8 @@ Begin
             DeleteFile(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
             // This may affects execute time
             ExecTime := SecondSpan(StartFlag, EndFlag);
-            writeln;
             TextColor(White);
-            writeln('--------------------');
+            writeln(#13#10,'--------------------');
             writeln('Execution Time: ', ExecTime:0:16, ' s');
             TextColor(LightGreen);
             if exitcode <> 0 then TextColor(Red);
@@ -275,10 +283,10 @@ Begin
     tmp := TEMPFOLDER;
     If DirectoryExists(tmp) then Begin
         {$IFDEF MSWINDOWS}
-        DeleteDir(tmp);
+            DeleteDir(tmp);
         {$ENDIF}
         {$IFDEF LINUX}
-        ExecuteProcess('/bin/bash', ['-c', 'rm -rf ' + tmp], []);
+            ExecuteProcess('/bin/bash', ['-c', 'rm -rf ' + tmp], []);
         {$ENDIF}
         CreateDir(tmp);
     End;
