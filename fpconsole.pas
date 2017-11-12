@@ -243,9 +243,8 @@ Begin
             DeleteFile(fname {$IFDEF MSWINDOWS}+ '.exe'{$ENDIF});
             // This may affects execute time
             ExecTime := SecondSpan(StartFlag, EndFlag);
-            writeln;
             TextColor(White);
-            writeln('--------------------');
+            writeln(#13#10,'--------------------');
             writeln('Execution Time: ', ExecTime:0:16, ' s');
             TextColor(LightGreen);
             if exitcode <> 0 then TextColor(Red);
