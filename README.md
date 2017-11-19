@@ -10,7 +10,7 @@ This debug tool helps you directly write input and get output in Free Pascal Com
 **Note**: FPConsole requires _Free Pascal Compiler_ installed on the system. [Download here](http://www.freepascal.org/download.var)
 
 ## Instructions:
-> These instructions are available in latest version ( **v1.5** ). For old version, checkout wiki page for proper parameter.
+> These instructions are available in latest version ( **v1.5.1** ). For old version, checkout wiki page for proper parameter.
 
 ### Simple Execute
 `fpconsole [command]`
@@ -101,6 +101,10 @@ i,j,m,n: integer;
 - https://sourceforge.net/projects/fpconsole
 
 ## Changelog
+
+### Version 1.5.1
+- Fix `SysFind();` function not working properly
+- Add icon
 
 ### Version 1.5
 - Open defualt editor to edit source before compiling (`-fe`) (#13)
