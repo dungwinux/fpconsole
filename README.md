@@ -5,14 +5,17 @@
 [![Download FPConsole](https://img.shields.io/sourceforge/dt/fpconsole.svg?style=flat-square)](https://sourceforge.net/projects/fpconsole/files/latest/download)
 
 ## Debug tool for Pascal Developer
+
 This debug tool helps you directly write input and get output in Free Pascal Compiler without writing a new file.
 
 **Note**: FPConsole requires _Free Pascal Compiler_ installed on the system. [Download here](http://www.freepascal.org/download.var)
 
 ## Instructions:
+
 > These instructions are available in latest version ( **v1.5.1** ). For old version, checkout wiki page for proper parameter.
 
 ### Simple Execute
+
 `fpconsole [command]`
 
 - Command Prompt : `fpconsole [command]`
@@ -69,6 +72,7 @@ PS C:\> .\fpconsole -fs "Code.pas"
 ```
 
 ### _(Optional Files)_ 
+
 - Add UNIT to _**_unit.dat**_
 ```pascal
 sysutils,
